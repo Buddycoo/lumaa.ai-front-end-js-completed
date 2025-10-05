@@ -705,6 +705,266 @@ class PostgreSQLAPITester:
             self.log_test("User Call Logs", False, f"Request failed: {str(e)}")
             return False
 
+    def test_user_leads(self):
+        """Test user leads endpoint"""
+        if not self.user_token:
+            self.log_test("User Leads", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/user/leads", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    self.log_test("User Leads", True, 
+                                f"Retrieved {len(data)} leads successfully")
+                    return True
+                else:
+                    self.log_test("User Leads", False, "Response is not a list")
+                    return False
+            else:
+                self.log_test("User Leads", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Leads", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_demo_users_verification(self):
+        """Test that demo users exist with required fields (sip_endpoints, concurrency)"""
+        if not self.admin_token:
+            self.log_test("Demo Users Verification", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/admin/users", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                users = response.json()
+                
+                # Check for demo user
+                demo_user = next((u for u in users if u.get("email") == "user@lumaa.ai"), None)
+                if not demo_user:
+                    self.log_test("Demo Users Verification", False, "Demo user (user@lumaa.ai) not found")
+                    return False
+                
+                # Verify required fields exist
+                required_fields = ['sip_endpoints', 'concurrency']
+                missing_fields = [field for field in required_fields if field not in demo_user or demo_user[field] is None]
+                
+                if not missing_fields:
+                    self.log_test("Demo Users Verification", True, 
+                                f"Demo user has required fields: sip_endpoints='{demo_user.get('sip_endpoints')}', concurrency={demo_user.get('concurrency')}")
+                    return True
+                else:
+                    self.log_test("Demo Users Verification", False, 
+                                f"Demo user missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Demo Users Verification", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Demo Users Verification", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_prompt_persistence(self):
+        """Test that user prompt updates persist in PostgreSQL database"""
+        if not self.user_token:
+            self.log_test("User Prompt Persistence", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            
+            # Update user bot settings with new prompt
+            test_prompt = f"Test prompt updated at {datetime.now().isoformat()}"
+            test_opening = f"Test opening message updated at {datetime.now().isoformat()}"
+            
+            update_data = {
+                "prompt": test_prompt,
+                "opening_message": test_opening
+            }
+            
+            # Update the settings
+            response = self.session.put(f"{self.api_url}/user/bot-settings", 
+                                      json=update_data, headers=headers, timeout=10)
+            
+            if response.status_code != 200:
+                self.log_test("User Prompt Persistence", False, 
+                            f"Failed to update settings: {response.status_code} - {response.text}")
+                return False
+            
+            # Retrieve the settings to verify persistence
+            response = self.session.get(f"{self.api_url}/user/bot-settings", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check if the prompt was saved (it might be combined with opening message)
+                saved_prompt = data.get("prompt", "")
+                saved_opening = data.get("opening_message", "")
+                
+                # The prompt might be stored in a combined format
+                if test_prompt in saved_prompt or test_opening in saved_opening:
+                    self.log_test("User Prompt Persistence", True, 
+                                "User prompt updates persist in PostgreSQL database",
+                                f"Saved prompt contains test data")
+                    return True
+                else:
+                    self.log_test("User Prompt Persistence", False, 
+                                f"Prompt not persisted correctly. Expected parts of '{test_prompt}' or '{test_opening}', got prompt: '{saved_prompt}', opening: '{saved_opening}'")
+                    return False
+            else:
+                self.log_test("User Prompt Persistence", False, 
+                            f"Failed to retrieve updated settings: {response.status_code}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Prompt Persistence", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_create_user(self):
+        """Test admin can create new user with all required fields"""
+        if not self.admin_token:
+            self.log_test("Admin Create User", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create test user data with all required fields
+            test_user_data = {
+                "name": "Test User Created",
+                "email": f"testuser_{datetime.now().timestamp()}@lumaa.ai",
+                "password": "pass",
+                "role": "user",
+                "category": "sales",
+                "pin_code": "9999",
+                "function": "Test Sales Agent",
+                "sip_endpoint": "sip:testuser@lumaa.ai",
+                "sip_endpoints": "sip:testuser1@lumaa.ai,sip:testuser2@lumaa.ai",
+                "concurrency": 3,
+                "min_subscribed": 500,
+                "monthly_plan_cost": 100.0
+            }
+            
+            response = self.session.post(f"{self.api_url}/admin/users", 
+                                       json=test_user_data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "User created successfully" and data.get("user_id"):
+                    self.log_test("Admin Create User", True, 
+                                "Admin successfully created user with all required fields",
+                                f"User ID: {data.get('user_id')}")
+                    return True
+                else:
+                    self.log_test("Admin Create User", False, 
+                                f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_test("Admin Create User", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Create User", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_bot_settings_real_estate(self):
+        """Test GET /api/admin/bot-settings/real_estate"""
+        if not self.admin_token:
+            self.log_test("Bot Settings Real Estate", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/admin/bot-settings/real_estate", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['model', 'temperature', 'opening_message', 'prompt']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Bot Settings Real Estate", True, 
+                                "Retrieved real estate bot settings successfully",
+                                f"Model: {data.get('model')}, Temperature: {data.get('temperature')}")
+                    return True
+                else:
+                    self.log_test("Bot Settings Real Estate", False, 
+                                f"Missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Bot Settings Real Estate", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Bot Settings Real Estate", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_bot_settings_update_sales(self):
+        """Test PUT /api/admin/bot-settings/sales with model: gpt-4, temperature: 0.8"""
+        if not self.admin_token:
+            self.log_test("Bot Settings Update Sales", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            update_data = {
+                "model": "gpt-4",
+                "temperature": 0.8
+            }
+            
+            response = self.session.put(f"{self.api_url}/admin/bot-settings/sales", 
+                                      json=update_data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Bot settings updated successfully":
+                    # Verify the update by retrieving the settings
+                    get_response = self.session.get(f"{self.api_url}/admin/bot-settings/sales", 
+                                                  headers=headers, timeout=10)
+                    
+                    if get_response.status_code == 200:
+                        settings = get_response.json()
+                        if settings.get("model") == "gpt-4" and settings.get("temperature") == 0.8:
+                            self.log_test("Bot Settings Update Sales", True, 
+                                        "Sales bot settings updated successfully",
+                                        f"Model: {settings.get('model')}, Temperature: {settings.get('temperature')}")
+                            return True
+                        else:
+                            self.log_test("Bot Settings Update Sales", False, 
+                                        f"Settings not updated correctly: model={settings.get('model')}, temp={settings.get('temperature')}")
+                            return False
+                    else:
+                        self.log_test("Bot Settings Update Sales", False, 
+                                    f"Failed to verify update: {get_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Bot Settings Update Sales", False, 
+                                f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_test("Bot Settings Update Sales", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Bot Settings Update Sales", False, f"Request failed: {str(e)}")
+            return False
+
     def test_system_status(self):
         """Test system status endpoint - should show PostgreSQL"""
         try:
