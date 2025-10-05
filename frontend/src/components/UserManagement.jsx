@@ -379,6 +379,106 @@ const UserManagement = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit User Modal */}
+      <Dialog open={editUserModal} onOpenChange={setEditUserModal}>
+        <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">Edit User</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <form onSubmit={handleEditUser} className="space-y-4">
+              <div>
+                <Label htmlFor="editName" className="text-gray-300">Full Name</Label>
+                <Input
+                  id="editName"
+                  value={selectedUser.name}
+                  onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editEmail" className="text-gray-300">Email Address</Label>
+                <Input
+                  id="editEmail"
+                  type="email"
+                  value={selectedUser.email}
+                  onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="editCategory" className="text-gray-300">Category</Label>
+                <Select 
+                  value={selectedUser.category} 
+                  onValueChange={(value) => setSelectedUser({...selectedUser, category: value})}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700">
+                    {categories.map(cat => (
+                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editMinutes" className="text-gray-300">Minutes Allocated</Label>
+                  <Input
+                    id="editMinutes"
+                    type="number"
+                    value={selectedUser.minutes_allocated}
+                    onChange={(e) => setSelectedUser({...selectedUser, minutes_allocated: parseInt(e.target.value)})}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="editPlanCost" className="text-gray-300">Monthly Plan Cost (AED)</Label>
+                  <Input
+                    id="editPlanCost"
+                    type="number"
+                    step="0.01"
+                    value={selectedUser.monthly_plan_cost || 150}
+                    onChange={(e) => setSelectedUser({...selectedUser, monthly_plan_cost: parseFloat(e.target.value)})}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
+                  Update User
+                </Button>
+                <Button 
+                  type="button"
+                  onClick={() => handleSendPaymentLink(selectedUser)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Send Payment Link
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setEditUserModal(false)}
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
