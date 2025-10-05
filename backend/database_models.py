@@ -110,11 +110,11 @@ class Lead(Base):
     call_logs = relationship("CallLog", back_populates="lead")
 
 class CallLog(Base):
-    __tablename__ = "call_logs"
+    __tablename__ = "lumaa_call_logs"
     
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey('users.id'), nullable=False)
-    lead_id = Column(String, ForeignKey('leads.id'), nullable=True)
+    user_id = Column(String, ForeignKey('lumaa_users.id'), nullable=False)
+    lead_id = Column(String, ForeignKey('lumaa_leads.id'), nullable=True)
     
     # Lead details (stored directly for quick access)
     lead_name = Column(String(255), nullable=False)
