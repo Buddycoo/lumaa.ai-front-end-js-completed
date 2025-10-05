@@ -12,7 +12,8 @@ import {
   Shield,
   Activity,
   Bell,
-  User
+  User,
+  DollarSign
 } from 'lucide-react';
 import { toast } from 'sonner';
 
