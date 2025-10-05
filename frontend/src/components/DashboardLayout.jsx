@@ -186,8 +186,10 @@ const DashboardLayout = ({ children }) => {
         <header className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <h2 className="text-lg font-semibold text-white">
-              Welcome, {user?.name}
+              {isAdmin ? 'Admin Dashboard' : 'Your Dashboard'}
             </h2>
+            <span className="text-gray-400">•</span>
+            <span className="text-sm text-gray-400">Welcome, {user?.name}</span>
           </div>
           
           <div className="flex items-center gap-3">
