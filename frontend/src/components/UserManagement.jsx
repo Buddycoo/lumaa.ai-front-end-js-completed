@@ -7,7 +7,7 @@ import { useAuthStore } from '../store/authStore';
 
 const UserManagement = () => {
   const { user } = useAuthStore();
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
+  const isAdmin = user?.role === 'admin';
   
   // Mock user data
   const users = [
