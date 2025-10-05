@@ -152,14 +152,24 @@ async def update_user(
 @router.post("/admin/users/{user_id}/pause", response_model=dict)
 async def pause_user(
     user_id: str,
+    pause_request: UserPauseRequest,
     admin_user: dict = Depends(get_admin_user),
     pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
 ):
+    # Verify admin PIN (1509)
+    if pause_request.admin_pin != "1509":
+        raise HTTPException(status_code=403, detail="Invalid PIN. Admin PIN required to pause users.")
+    
     from database_models import UserStatus
-    success = await pg_db_manager.update_user_status(user_id, UserStatus.PAUSED, admin_user["id"])
+    success = await pg_db_manager.update_user_status(
+        user_id, 
+        UserStatus.PAUSED, 
+        admin_user["id"],
+        pause_reason=pause_request.reason
+    )
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"message": "User paused successfully"}
+    return {"message": "User paused successfully", "reason": pause_request.reason}
 
 @router.post("/admin/users/{user_id}/resume", response_model=dict)
 async def resume_user(
@@ -168,7 +178,12 @@ async def resume_user(
     pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
 ):
     from database_models import UserStatus
-    success = await pg_db_manager.update_user_status(user_id, UserStatus.ACTIVE, admin_user["id"])
+    success = await pg_db_manager.update_user_status(
+        user_id, 
+        UserStatus.ACTIVE, 
+        admin_user["id"],
+        pause_reason=None  # Clear pause reason when resuming
+    )
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User resumed successfully"}
