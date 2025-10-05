@@ -229,7 +229,7 @@ class DatabaseManager:
 
     async def get_user_call_logs(self, user_id: str, limit: int = 100) -> List[dict]:
         """Get call logs for a user (no revenue data)"""
-        call_logs = await self.call_logs.find({"user_id": user_id}).limit(limit).to_list(length=None)
+        call_logs = await self.call_logs.find({"user_id": user_id}, {"_id": 0}).limit(limit).to_list(length=None)
         
         # Remove revenue data for user view
         for log in call_logs:
