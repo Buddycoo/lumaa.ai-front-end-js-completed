@@ -153,10 +153,12 @@ const Login = () => {
               </Button>
             </div>
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
-                Demo Credentials: admin@lumaa.ai / admin123
-              </p>
+            <div className="mt-6 text-center space-y-2">
+              <p className="text-sm text-gray-400 font-medium">Demo Credentials:</p>
+              <div className="bg-gray-800 p-3 rounded-md space-y-1">
+                <p className="text-sm text-[#00FFD1]">👑 Admin: <span className="text-white">admin@lumaa.ai</span> / <span className="text-white">pass</span></p>
+                <p className="text-sm text-blue-400">👤 User: <span className="text-white">user@lumaa.ai</span> / <span className="text-white">pass</span></p>
+              </div>
             </div>
             
             <div className="mt-4 text-center">
