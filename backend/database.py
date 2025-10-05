@@ -70,7 +70,7 @@ class DatabaseManager:
 
     async def get_user_by_email(self, email: str) -> Optional[dict]:
         """Get user by email"""
-        user = await self.users.find_one({"email": email})
+        user = await self.users.find_one({"email": email}, {"_id": 0})
         if user:
             return self._parse_from_mongo(user)
         return None
