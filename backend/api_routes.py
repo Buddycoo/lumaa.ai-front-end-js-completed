@@ -62,11 +62,25 @@ async def login(credentials: UserLogin, pg_db_manager: PostgreSQLManager = Depen
 
 @router.get("/auth/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    from datetime import datetime, timezone
+    
+    # Calculate days until billing
+    next_billing = current_user.get("next_billing_date")
+    if next_billing:
+        if isinstance(next_billing, str):
+            from datetime import datetime
+            next_billing = datetime.fromisoformat(next_billing.replace('Z', '+00:00'))
+        days_until_billing = max(0, (next_billing - datetime.now(timezone.utc)).days)
+    else:
+        days_until_billing = 0
+    
+    user_data = current_user.copy()
+    user_data["days_until_billing"] = days_until_billing
+    
     if current_user.get("role") == "admin":
-        return AdminUserResponse(**current_user)
+        return AdminUserResponse(**user_data)
     else:
         # Remove revenue for regular users
-        user_data = current_user.copy()
         user_data.pop("revenue_generated", None)
         return UserDashboardResponse(**user_data)
 
