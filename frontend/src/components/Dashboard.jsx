@@ -1,26 +1,44 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import Overview from './Overview';
-import CallLogs from './CallLogs';
-import BotSettings from './BotSettings';
-import UserManagement from './UserManagement';
+import AdminOverview from './AdminOverview';
+import UserOverview from './UserOverview';
+import UserCallLogs from './UserCallLogs';
+import UserBotSettings from './UserBotSettings';
+import UserLeads from './UserLeads';
+import AdminUserManagement from './AdminUserManagement';
+import Settings from './Settings';
 import { useAuthStore } from '../store/authStore';
 
 const Dashboard = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
+  const isAdmin = user?.role === 'admin';
+  
   return (
     <DashboardLayout>
       <Routes>
-        <Route path="/" element={<Overview />} />
-        <Route path="/calls" element={<CallLogs />} />
-        <Route path="/settings" element={<BotSettings />} />
-        <Route path="/users" element={<UserManagement />} />
+        {/* Admin Routes */}
+        {isAdmin ? (
+          <>
+            <Route path="/" element={<AdminOverview />} />
+            <Route path="/users" element={<AdminUserManagement />} />
+            <Route path="/settings" element={<Settings />} />
+          </>
+        ) : (
+          /* User Routes */
+          <>
+            <Route path="/" element={<UserOverview />} />
+            <Route path="/calls" element={<UserCallLogs />} />
+            <Route path="/bot-settings" element={<UserBotSettings />} />
+            <Route path="/leads" element={<UserLeads />} />
+            <Route path="/settings" element={<Settings />} />
+          </>
+        )}
       </Routes>
     </DashboardLayout>
   );
