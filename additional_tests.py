@@ -91,7 +91,7 @@ class EdgeCaseTester:
                     print("✅ Blocked user correctly denied login")
                     
                     # Resume the user
-                    resume_response = self.session.post(f"{self.api_url}/admin/users/2/resume", headers=headers)
+                    resume_response = self.session.post(f"{self.api_url}/admin/users/{user_id}/resume", headers=headers)
                     if resume_response.status_code == 200:
                         print("✅ User resumed successfully")
                         return True
