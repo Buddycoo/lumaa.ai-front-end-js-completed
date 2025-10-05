@@ -32,6 +32,17 @@ class UserStatus(str, Enum):
     PAUSED = "paused"
     BLOCKED = "blocked"
 
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    OVERDUE = "overdue"
+    CANCELLED = "cancelled"
+
+class TransactionType(str, Enum):
+    TOPUP = "topup"
+    MONTHLY_BILL = "monthly_bill"
+    USAGE_CHARGE = "usage_charge"
+
 # Database Models
 class User(BaseModel):
     id: str
