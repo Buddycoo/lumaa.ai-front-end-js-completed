@@ -182,10 +182,8 @@ async function main() {
   ];
 
   for (const clientData of clients) {
-    await prisma.client.upsert({
-      where: { email: clientData.email },
-      update: {},
-      create: clientData
+    await prisma.client.create({
+      data: clientData
     });
   }
   console.log('✅ Created sample clients');
