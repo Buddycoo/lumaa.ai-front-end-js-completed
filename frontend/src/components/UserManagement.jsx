@@ -327,10 +327,7 @@ const UserManagement = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          setSelectedUser(userData);
-                          setEditUserModal(true);
-                        }}
+                        onClick={() => openEditModal(userData)}
                         className="border-gray-700 text-gray-300 hover:bg-gray-700"
                       >
                         <Edit className="h-3 w-3" />
