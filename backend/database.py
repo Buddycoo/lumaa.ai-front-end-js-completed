@@ -239,7 +239,7 @@ class DatabaseManager:
 
     async def get_all_call_logs(self, limit: int = 100) -> List[dict]:
         """Get all call logs (admin view with revenue)"""
-        call_logs = await self.call_logs.find({}).limit(limit).to_list(length=None)
+        call_logs = await self.call_logs.find({}, {"_id": 0}).limit(limit).to_list(length=None)
         
         # Add user names for admin view
         for log in call_logs:
