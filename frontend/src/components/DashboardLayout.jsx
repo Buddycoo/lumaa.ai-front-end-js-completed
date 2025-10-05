@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
+  const isAdmin = user?.role === 'admin';
   
   const handleLogout = () => {
     logout();
