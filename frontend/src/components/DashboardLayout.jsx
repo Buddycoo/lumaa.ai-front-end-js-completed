@@ -28,34 +28,54 @@ const DashboardLayout = ({ children }) => {
     navigate('/');
   };
   
-  const menuItems = [
+  // Admin menu - NO call logs, focus on user management
+  const adminMenuItems = [
     {
       icon: LayoutDashboard,
       label: 'Overview',
-      href: '/dashboard',
-      adminOnly: false
+      href: '/dashboard'
+    },
+    {
+      icon: Users,
+      label: 'User Management',
+      href: '/dashboard/users'
+    },
+    {
+      icon: Settings,
+      label: 'Settings',
+      href: '/dashboard/settings'
+    }
+  ];
+
+  // User menu - includes call logs, bot settings, conditional CSV upload
+  const userMenuItems = [
+    {
+      icon: LayoutDashboard,
+      label: 'Overview',
+      href: '/dashboard'
     },
     {
       icon: Phone,
       label: 'Call Logs',
-      href: '/dashboard/calls',
-      adminOnly: false
+      href: '/dashboard/calls'
     },
     {
       icon: Settings,
       label: 'Bot Settings',
-      href: '/dashboard/settings',
-      adminOnly: false
-    },
-    {
-      icon: Users,
-      label: 'User Control',
-      href: '/dashboard/users',
-      adminOnly: true
+      href: '/dashboard/settings'
     }
   ];
+
+  // Add CSV upload only for sales category users
+  if (user?.category === 'sales') {
+    userMenuItems.splice(2, 0, {
+      icon: BarChart3,
+      label: 'Upload Leads',
+      href: '/dashboard/leads'
+    });
+  }
   
-  const visibleMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
+  const visibleMenuItems = isAdmin ? adminMenuItems : userMenuItems;
   
   return (
     <div className="h-screen bg-black flex">
