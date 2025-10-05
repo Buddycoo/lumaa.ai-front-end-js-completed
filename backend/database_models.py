@@ -62,6 +62,7 @@ class User(Base):
     category = Column(Enum(UserCategory), nullable=False)
     pin_code = Column(String(6), nullable=False)
     status = Column(Enum(UserStatus), default=UserStatus.ACTIVE, nullable=False)
+    pause_reason = Column(String(500), nullable=True)  # Reason for pausing/blocking user
     
     # Expanded user fields as requested
     function = Column(String(255), nullable=True)  # User's job function
