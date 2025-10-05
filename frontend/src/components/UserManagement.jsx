@@ -582,6 +582,140 @@ const UserManagement = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* Pause Single User Modal */}
+      <Dialog open={pauseModal} onOpenChange={setPauseModal}>
+        <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Pause className="h-5 w-5 text-yellow-400" />
+              Pause User
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handlePauseUser} className="space-y-4">
+            <div>
+              <Label htmlFor="pause-reason" className="text-gray-300">Reason for Pausing *</Label>
+              <select
+                id="pause-reason"
+                value={pauseData.reason}
+                onChange={(e) => setPauseData({...pauseData, reason: e.target.value})}
+                className="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white"
+                required
+              >
+                <option value="">Select a reason...</option>
+                {pauseReasons.map(reason => (
+                  <option key={reason} value={reason}>{reason}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <Label htmlFor="pause-pin" className="text-gray-300">Admin PIN *</Label>
+              <Input
+                id="pause-pin"
+                type="password"
+                value={pauseData.admin_pin}
+                onChange={(e) => setPauseData({...pauseData, admin_pin: e.target.value})}
+                className="bg-gray-800 border-gray-700 text-white"
+                placeholder="Enter PIN (1509)"
+                maxLength={4}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">PIN protection required to pause users</p>
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setPauseModal(false);
+                  setPauseData({ reason: '', admin_pin: '' });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                Pause User
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Pause All Users Modal */}
+      <Dialog open={pauseAllModal} onOpenChange={setPauseAllModal}>
+        <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Pause className="h-5 w-5 text-yellow-400" />
+              Pause All Users
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handlePauseAllUsers} className="space-y-4">
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <p className="text-sm text-yellow-300">
+                ⚠️ This will pause all active users. They will be able to login but cannot access any features.
+              </p>
+            </div>
+            
+            <div>
+              <Label htmlFor="pause-all-reason" className="text-gray-300">Reason for Global Pause *</Label>
+              <select
+                id="pause-all-reason"
+                value={pauseData.reason}
+                onChange={(e) => setPauseData({...pauseData, reason: e.target.value})}
+                className="w-full p-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white"
+                required
+              >
+                <option value="">Select a reason...</option>
+                {pauseReasons.map(reason => (
+                  <option key={reason} value={reason}>{reason}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <Label htmlFor="pause-all-pin" className="text-gray-300">Admin PIN *</Label>
+              <Input
+                id="pause-all-pin"
+                type="password"
+                value={pauseData.admin_pin}
+                onChange={(e) => setPauseData({...pauseData, admin_pin: e.target.value})}
+                className="bg-gray-800 border-gray-700 text-white"
+                placeholder="Enter PIN (1509)"
+                maxLength={4}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">PIN 1509 required for global pause</p>
+            </div>
+            
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setPauseAllModal(false);
+                  setPauseData({ reason: '', admin_pin: '' });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                Pause All Users
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
