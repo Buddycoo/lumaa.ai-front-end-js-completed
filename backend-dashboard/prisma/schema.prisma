@@ -90,16 +90,6 @@ model Client {
   @@map("clients")
 }
 
-enum Role {
-  SUPERADMIN
-  ADMIN
-  USER
-}
-
-enum CallStatus {
-  SUCCESS
-  FAILED
-  BUSY
-  NO_ANSWER
-  INVALID_NUMBER
-}
+// SQLite doesn't support enums - using strings instead
+// Role: "SUPERADMIN" | "ADMIN" | "USER"  
+// CallStatus: "SUCCESS" | "FAILED" | "BUSY" | "NO_ANSWER" | "INVALID_NUMBER"
