@@ -266,18 +266,23 @@ const UserManagement = () => {
             Pause All
           </Button>
           
-          <Dialog open={addUserModal} onOpenChange={setAddUserModal}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
-                <Plus className="h-4 w-4 mr-2" />
-                Add User
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-900 border-gray-800">
-              <DialogHeader>
-                <DialogTitle className="text-white">Add New User</DialogTitle>
-              </DialogHeader>
-            <form onSubmit={handleAddUser} className="space-y-4">
+          <Button 
+            onClick={() => setAddUserModal(true)}
+            className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add User
+          </Button>
+        </div>
+      </div>
+      
+      {/* Add User Modal */}
+      <Dialog open={addUserModal} onOpenChange={setAddUserModal}>
+        <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">Add New User</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddUser} className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-gray-300">Full Name</Label>
                 <Input
