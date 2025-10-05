@@ -177,15 +177,15 @@ const LandingPage = () => {
           >
             Contact
           </button>
-          <a 
-            href="http://localhost:3001/login" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary text-sm px-4 py-2 min-h-10 ml-4 no-underline"
-            onClick={() => trackButtonClick('Login', 'Header Navigation')}
+          <button 
+            onClick={() => {
+              trackButtonClick('Login', 'Header Navigation');
+              window.location.href = '/login';
+            }}
+            className="btn-secondary text-sm px-4 py-2 min-h-10 ml-4"
           >
             Login
-          </a>
+          </button>
         </nav>
         
         {/* Mobile Navigation */}
