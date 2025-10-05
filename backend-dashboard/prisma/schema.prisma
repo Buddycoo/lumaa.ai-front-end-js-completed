@@ -13,7 +13,7 @@ model User {
   name        String
   password    String?
   googleId    String?  @unique
-  role        Role     @default(USER)
+  role        String   @default("USER")
   pinCode     String?
   minutesUsed Float    @default(0)
   minutesLeft Float    @default(0)
