@@ -97,6 +97,39 @@ const UserManagement = () => {
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setEditUserModal(true);
+  };
+
+  const handleEditUser = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`/admin/users/${selectedUser.id}/edit`, selectedUser);
+      toast.success('User updated successfully');
+      setEditUserModal(false);
+      setSelectedUser(null);
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update user');
+    }
+  };
+
+  const handleSendPaymentLink = async (user) => {
+    try {
+      const response = await axios.post('/admin/send-payment-link', {
+        user_id: user.id,
+        amount: user.monthly_plan_cost || 150,
+        description: `Monthly subscription - ${new Date().toLocaleDateString()}`
+      });
+      
+      toast.success(`Payment link sent to ${user.name}`);
+      console.log('Payment link:', response.data.payment_link);
+    } catch (error) {
+      toast.error('Failed to send payment link');
+    }
+  };
   
   if (!isAdmin) {
     return (
