@@ -210,6 +210,42 @@ const Overview = () => {
           />
         </div>
         
+        {/* Top Users by Revenue */}
+        {adminStats.top_users && adminStats.top_users.length > 0 && (
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-[#00FFD1]" />
+                Top Users by Revenue
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Highest revenue generating users
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {adminStats.top_users.map((user, index) => (
+                  <div key={user.id} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#00FFD1]/20 flex items-center justify-center">
+                        <span className="text-[#00FFD1] font-bold">#{index + 1}</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">{user.name}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-semibold">${user.revenue.toLocaleString()}</p>
+                      <p className="text-xs text-gray-400">{user.minutes_used} minutes</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* System Status */}
         <Card className="bg-gray-900 border-gray-800">
           <CardHeader>
