@@ -559,15 +559,30 @@ async def initialize_demo_data(db_manager: DatabaseManager):
     # Check if regular user exists
     user = await db_manager.get_user_by_email("user@lumaa.ai")
     if not user:
-        user_data = UserCreateRequest(
-            name="Regular User",
-            email="user@lumaa.ai", 
-            password="pass",
-            category=UserCategory.REAL_ESTATE,
-            pin_code="5678",
-            minutes_allocated=1000
-        )
-        await db_manager.create_user(user_data)
+        from datetime import timedelta
+        next_month = datetime.now(timezone.utc) + timedelta(days=30)
+        
+        user_doc = {
+            "id": db_manager._generate_id(),
+            "name": "Regular User",
+            "email": "user@lumaa.ai",
+            "password": db_manager._hash_password("pass"),
+            "role": UserRole.USER,
+            "category": UserCategory.REAL_ESTATE,
+            "pin_code": "5678",
+            "status": UserStatus.ACTIVE,
+            "minutes_used": 234,
+            "minutes_allocated": 1000,
+            "revenue_generated": 0.0,
+            "credits_balance": 250.0,
+            "monthly_plan_cost": 150.0,  # 150 AED per month
+            "next_billing_date": next_month.isoformat(),
+            "payment_status": "paid",
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db_manager.users.insert_one(user_doc)
     
     # Initialize default bot settings for each category
     categories = [UserCategory.REAL_ESTATE, UserCategory.HOSPITALITY, UserCategory.SALES, 
