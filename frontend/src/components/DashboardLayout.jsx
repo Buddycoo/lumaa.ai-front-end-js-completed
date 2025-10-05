@@ -106,14 +106,6 @@ const DashboardLayout = ({ children }) => {
   ];
   
   const menuItems = isAdmin ? adminMenuItems : userMenuItems;
-      icon: Users,
-      label: 'User Control',
-      href: '/dashboard/users',
-      adminOnly: true
-    }
-  ];
-  
-  const visibleMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
   
   return (
     <div className="h-screen bg-black flex">
