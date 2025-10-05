@@ -410,6 +410,9 @@ backend:
 
 agent_communication:
     -agent: "testing"
+    -agent: "main"
+    -message: "PostgreSQL migration started. Implementing new database schema with lumaa_ prefix tables to avoid conflicts with existing database tables (leads, call_logs). Backend configured to use PostgreSQL URL from environment. All API routes updated to use PostgreSQLManager."
+
     -message: "Starting comprehensive testing of Lumaa AI landing page. Will test navigation, hero section, interactive elements, contact form, responsive design, and visual design elements."
     -agent: "testing"
     -message: "TESTING COMPLETED: Most functionality working well. Navigation, hero section, interactive elements, contact form, and visual design all passed testing. One issue identified: mobile navigation needs improvement - desktop nav menu remains visible on mobile devices. Console warnings about Meta Pixel and WebGL are minor and don't affect core functionality."
