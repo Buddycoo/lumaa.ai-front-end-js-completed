@@ -43,6 +43,11 @@ const DashboardLayout = ({ children }) => {
       href: '/dashboard/users'
     },
     {
+      icon: Bell,
+      label: 'Send Updates',
+      href: '/dashboard/send-updates'
+    },
+    {
       icon: Settings,
       label: 'Settings',
       href: '/dashboard/settings'
