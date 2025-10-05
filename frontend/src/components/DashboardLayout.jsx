@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, NavLink, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useAuthStore } from '../store/authStore';
 import {
   LayoutDashboard,
+  BarChart3,
   Phone,
   Settings,
   Users,
   LogOut,
-  FileText,
-  Bot,
-  Upload,
-  AlertTriangle,
   Shield,
+  Activity,
   Bell,
   User
 } from 'lucide-react';
 import { toast } from 'sonner';
-import axios from 'axios';
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
