@@ -191,6 +191,32 @@ class Transaction(Base):
     # Relationships
     user = relationship("User", back_populates="transactions")
 
+
+class NotificationType(str, enum.Enum):
+    CONTACT_FORM = "contact_form"
+    ADMIN_UPDATE = "admin_update"
+    SYSTEM = "system"
+    PASSWORD_RESET = "password_reset"
+
+class Notification(Base):
+    __tablename__ = "lumaa_notifications"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    user_id = Column(String, ForeignKey('lumaa_users.id'), nullable=True)  # Null for admin notifications
+    type = Column(Enum(NotificationType), nullable=False)
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    data = Column(Text, nullable=True)  # JSON data for additional info
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=func.now())
+    
+    # For contact form notifications
+    contact_name = Column(String(255), nullable=True)
+    contact_email = Column(String(255), nullable=True)
+    contact_phone = Column(String(50), nullable=True)
+    contact_company = Column(String(255), nullable=True)
+
+
 class SystemSettings(Base):
     __tablename__ = "lumaa_system_settings"
     
