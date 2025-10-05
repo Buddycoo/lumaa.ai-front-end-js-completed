@@ -39,7 +39,7 @@ const AdminSendUpdates = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/admin/users', {
+      const response = await axios.get('/admin/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
@@ -69,7 +69,7 @@ const AdminSendUpdates = () => {
     setSending(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/admin/send-update', formData, {
+      const response = await axios.post('/admin/send-update', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
