@@ -275,6 +275,153 @@ const Login = () => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <Card className="bg-gray-900 border-gray-800 w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Reset Password
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  {forgotPasswordStep === 1 && "Enter your email to receive a verification code"}
+                  {forgotPasswordStep === 2 && "Enter the 6-digit code sent to your email"}
+                  {forgotPasswordStep === 3 && "Enter your new password"}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent>
+                {forgotPasswordStep === 1 && (
+                  <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email" className="text-gray-300">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="forgot-email"
+                          type="email"
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          required
+                          placeholder="your@email.com"
+                          className="bg-gray-800 border-gray-700 text-white pl-10"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        onClick={resetForgotPasswordModal}
+                        variant="outline"
+                        className="flex-1 bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={resetLoading}
+                        className="flex-1 bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+                      >
+                        {resetLoading ? 'Sending...' : 'Send Code'}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+                
+                {forgotPasswordStep === 2 && (
+                  <form onSubmit={handleVerifyCode} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-code" className="text-gray-300">Verification Code</Label>
+                      <Input
+                        id="reset-code"
+                        type="text"
+                        value={resetCode}
+                        onChange={(e) => setResetCode(e.target.value)}
+                        required
+                        maxLength={6}
+                        placeholder="123456"
+                        className="bg-gray-800 border-gray-700 text-white text-center text-2xl tracking-widest"
+                      />
+                      <p className="text-xs text-gray-400">
+                        Code sent to {forgotEmail}
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => setForgotPasswordStep(1)}
+                        variant="outline"
+                        className="flex-1 bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={resetLoading}
+                        className="flex-1 bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+                      >
+                        {resetLoading ? 'Verifying...' : 'Verify Code'}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+                
+                {forgotPasswordStep === 3 && (
+                  <form onSubmit={handleResetPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="new-password" className="text-gray-300">New Password</Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        placeholder="Min 8 characters"
+                        className="bg-gray-800 border-gray-700 text-white"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-new-password" className="text-gray-300">Confirm Password</Label>
+                      <Input
+                        id="confirm-new-password"
+                        type="password"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        required
+                        placeholder="Re-enter password"
+                        className="bg-gray-800 border-gray-700 text-white"
+                      />
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        onClick={resetForgotPasswordModal}
+                        variant="outline"
+                        className="flex-1 bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={resetLoading}
+                        className="flex-1 bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+                      >
+                        {resetLoading ? 'Resetting...' : 'Reset Password'}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
