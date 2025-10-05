@@ -190,15 +190,15 @@ const LandingPage = () => {
         
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center gap-2">
-          <a 
-            href="http://localhost:3001/login" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary text-xs px-3 py-2 min-h-8 no-underline"
-            onClick={() => trackButtonClick('Login', 'Mobile Header')}
+          <button 
+            onClick={() => {
+              trackButtonClick('Login', 'Mobile Header');
+              window.location.href = '/login';
+            }}
+            className="btn-secondary text-xs px-3 py-2 min-h-8"
           >
             Login
-          </a>
+          </button>
           <Button 
             className="btn-primary text-xs px-3 py-2 min-h-8"
             onClick={() => {
