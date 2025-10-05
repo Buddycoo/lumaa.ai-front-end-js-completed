@@ -55,42 +55,62 @@ const BotSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* User Editable Fields */}
             <div className="space-y-2">
               <Label className="text-gray-300">Opening Message</Label>
+              <p className="text-xs text-gray-500">Short greeting message (max 500 characters)</p>
               <Textarea
                 placeholder="Hello! I'm your AI assistant from Lumaa AI. How can I help you today?"
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[100px]"
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[80px]"
                 value={settings.openingMessage}
                 onChange={(e) => setSettings({ ...settings, openingMessage: e.target.value })}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-300">System Prompt</Label>
+              <p className="text-xs text-gray-500">Detailed instructions for AI behavior (max 2000 characters)</p>
+              <Textarea
+                placeholder="You are a professional AI assistant. Be helpful, courteous, and provide accurate information..."
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[150px]"
+                value={settings.prompt}
+                onChange={(e) => setSettings({ ...settings, prompt: e.target.value })}
+                maxLength={2000}
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-gray-300">AI Model</Label>
-                <select 
-                  className="w-full h-10 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
-                  value={settings.model}
-                  onChange={(e) => setSettings({ ...settings, model: e.target.value })}
-                >
-                  <option value="gpt-4.1">GPT-4.1</option>
-                  <option value="lumaa-sales">Lumaa-Sales-LLM</option>
-                  <option value="gpt-3.5">GPT-3.5-Turbo</option>
-                </select>
+            {/* Read-Only Admin Controlled Fields */}
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+              <h3 className="text-white font-medium mb-3 flex items-center gap-2">
+                <Settings className="h-4 w-4 text-gray-400" />
+                Admin Controlled Settings (Read-Only)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-gray-400">AI Model</Label>
+                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm">
+                    {settings.model}
+                  </div>
+                </div>
+                
+                <div className="space-y-1">
+                  <Label className="text-gray-400">Temperature</Label>
+                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm">
+                    {settings.temperature}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-gray-400">Category</Label>
+                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm capitalize">
+                    {settings.category.replace('_', ' ')}
+                  </div>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label className="text-gray-300">Category</Label>
-                <select 
-                  className="w-full h-10 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
-                  value={settings.category}
-                  onChange={(e) => setSettings({ ...settings, category: e.target.value })}
-                >
-                  <option value="sales">Sales</option>
-                  <option value="support">Customer Support</option>
-                  <option value="appointment">Appointment Booking</option>
-                </select>
-              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                These settings are managed by your administrator
+              </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
