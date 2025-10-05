@@ -6,6 +6,7 @@ import CallLogs from './CallLogs';
 import BotSettings from './BotSettings';
 import UserManagement from './UserManagement';
 import UserPayments from './UserPayments';
+import AdminSendUpdates from './AdminSendUpdates';
 import { useAuthStore } from '../store/authStore';
 
 const Dashboard = () => {
