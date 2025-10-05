@@ -208,6 +208,8 @@ class UserResponse(BaseModel):
     minutes_used: int
     minutes_allocated: int
     revenue_generated: float
+    sip_endpoints: Optional[str] = None
+    concurrency: Optional[int] = None
     created_at: datetime
 
 class AdminUserResponse(UserResponse):
