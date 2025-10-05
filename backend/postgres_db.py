@@ -604,6 +604,23 @@ class PostgreSQLManager:
             session.close()
 
 
+    def _notification_to_dict(self, notification: Notification) -> Dict:
+        return {
+            "id": notification.id,
+            "user_id": notification.user_id,
+            "type": notification.type.value,
+            "title": notification.title,
+            "message": notification.message,
+            "data": notification.data,
+            "is_read": notification.is_read,
+            "contact_name": notification.contact_name,
+            "contact_email": notification.contact_email,
+            "contact_phone": notification.contact_phone,
+            "contact_company": notification.contact_company,
+            "created_at": notification.created_at
+        }
+
+
 
     # Helper methods to convert SQLAlchemy objects to dicts
     def _user_to_dict(self, user: User) -> Dict:
