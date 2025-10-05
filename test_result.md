@@ -455,6 +455,9 @@ backend:
         -working: "NA"
         -agent: "main"
         -comment: "Implemented admin send updates feature: 1) New 'Send Updates' menu item in admin sidebar. 2) Full composer interface with subject and message fields. 3) Recipient selection: All users, by category, or individual selection. 4) Delivery method toggles: In-app notification and email (email pending AWS credentials). 5) Shows recipient count before sending. 6) Creates notifications for selected users via /api/admin/send-update endpoint. 7) Success toast with count of recipients."
+        -working: true
+        -agent: "testing"
+        -comment: "✅ ADMIN SEND UPDATES TESTING COMPLETED: POST /api/admin/send-update working perfectly for all recipient types. ✅ ALL USERS: Successfully sent system maintenance notice to 8 users, created 8 notifications. ✅ CATEGORY TARGETING: Successfully sent sales team update to 7 users in sales category. ✅ NOTIFICATION CREATION: All updates properly create in-app notifications for targeted users. ✅ ADMIN AUTHORIZATION: Endpoint correctly requires admin token. Admin can broadcast messages to all users, specific categories (sales, real_estate, etc.), or individual users. All notification IDs returned for tracking."
 
   - task: "Phase 5: Contact Form Integration"
     implemented: true
