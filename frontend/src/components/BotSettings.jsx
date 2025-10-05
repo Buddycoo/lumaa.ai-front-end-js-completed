@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Textarea } from './ui/textarea';
-import { Settings, Save } from 'lucide-react';
+import { Slider } from './ui/slider';
+import { Settings, Save, Bot, Cpu, Thermometer } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const BotSettings = () => {
   const [settings, setSettings] = useState({
