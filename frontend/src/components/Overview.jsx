@@ -67,7 +67,7 @@ const Overview = () => {
       const token = localStorage.getItem('token');
       
       // Fetch call logs to calculate stats
-      const callLogsResponse = await axios.get('/api/user/call-logs', {
+      const callLogsResponse = await axios.get('/user/call-logs', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
