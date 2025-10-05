@@ -320,46 +320,484 @@ class ComprehensiveAPITester:
             self.log_test("Protected Endpoint (Invalid Token)", False, f"Request failed: {str(e)}")
             return False
     
+    def test_enhanced_auth_me_admin(self):
+        """Test /auth/me endpoint for admin (should include revenue)"""
+        if not self.admin_token:
+            self.log_test("Enhanced Auth Me (Admin)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/auth/me", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Admin should see revenue_generated field
+                if "revenue_generated" in data:
+                    self.log_test("Enhanced Auth Me (Admin)", True, 
+                                "Admin can see revenue data in /auth/me",
+                                f"Revenue: ${data.get('revenue_generated', 0)}")
+                    return True
+                else:
+                    self.log_test("Enhanced Auth Me (Admin)", False, 
+                                "Admin missing revenue_generated field")
+                    return False
+            else:
+                self.log_test("Enhanced Auth Me (Admin)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Enhanced Auth Me (Admin)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_enhanced_auth_me_user(self):
+        """Test /auth/me endpoint for user (should NOT include revenue)"""
+        if not self.user_token:
+            self.log_test("Enhanced Auth Me (User)", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/auth/me", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # User should NOT see revenue_generated field
+                if "revenue_generated" not in data:
+                    self.log_test("Enhanced Auth Me (User)", True, 
+                                "User correctly cannot see revenue data",
+                                f"User: {data.get('name')} ({data.get('category')})")
+                    return True
+                else:
+                    self.log_test("Enhanced Auth Me (User)", False, 
+                                "User can see revenue_generated field (security issue)")
+                    return False
+            else:
+                self.log_test("Enhanced Auth Me (User)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Enhanced Auth Me (User)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_pin_verification_admin(self):
+        """Test PIN verification for admin user"""
+        if not self.admin_token:
+            self.log_test("PIN Verification (Admin)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            payload = {"pin": "1234"}  # Admin PIN from demo data
+            response = self.session.post(f"{self.api_url}/auth/verify-pin", 
+                                       json=payload, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                self.log_test("PIN Verification (Admin)", True, 
+                            "Admin PIN verification successful")
+                return True
+            else:
+                self.log_test("PIN Verification (Admin)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("PIN Verification (Admin)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_pin_verification_user(self):
+        """Test PIN verification for regular user"""
+        if not self.user_token:
+            self.log_test("PIN Verification (User)", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            payload = {"pin": "5678"}  # User PIN from demo data
+            response = self.session.post(f"{self.api_url}/auth/verify-pin", 
+                                       json=payload, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                self.log_test("PIN Verification (User)", True, 
+                            "User PIN verification successful")
+                return True
+            else:
+                self.log_test("PIN Verification (User)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("PIN Verification (User)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_get_users(self):
+        """Test admin endpoint to get all users"""
+        if not self.admin_token:
+            self.log_test("Admin Get Users", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/admin/users", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    self.log_test("Admin Get Users", True, 
+                                f"Retrieved {len(data)} users successfully",
+                                f"Users include revenue data: {any('revenue_generated' in user for user in data)}")
+                    return True
+                else:
+                    self.log_test("Admin Get Users", False, "Response is not a list")
+                    return False
+            else:
+                self.log_test("Admin Get Users", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Get Users", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_access_admin_endpoint(self):
+        """Test that regular user cannot access admin endpoints"""
+        if not self.user_token:
+            self.log_test("User Access Admin Endpoint", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/admin/users", headers=headers, timeout=10)
+            
+            if response.status_code == 403:
+                self.log_test("User Access Admin Endpoint", True, 
+                            "User correctly denied access to admin endpoint")
+                return True
+            else:
+                self.log_test("User Access Admin Endpoint", False, 
+                            f"Expected 403, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Access Admin Endpoint", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_overview(self):
+        """Test admin overview endpoint"""
+        if not self.admin_token:
+            self.log_test("Admin Overview", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/admin/overview", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['total_revenue', 'total_minutes_used', 'total_users', 'active_users']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Admin Overview", True, 
+                                "Admin overview data retrieved successfully",
+                                f"Revenue: ${data.get('total_revenue', 0)}, Users: {data.get('total_users', 0)}")
+                    return True
+                else:
+                    self.log_test("Admin Overview", False, 
+                                f"Missing fields in overview: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Admin Overview", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Overview", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_bot_settings_admin(self):
+        """Test admin bot settings endpoints"""
+        if not self.admin_token:
+            self.log_test("Bot Settings (Admin)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Test getting bot settings for sales category
+            response = self.session.get(f"{self.api_url}/admin/bot-settings/sales", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['model', 'temperature', 'opening_message', 'prompt']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Bot Settings (Admin)", True, 
+                                "Admin can retrieve bot settings for category",
+                                f"Model: {data.get('model')}, Temp: {data.get('temperature')}")
+                    return True
+                else:
+                    self.log_test("Bot Settings (Admin)", False, 
+                                f"Missing fields in bot settings: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Bot Settings (Admin)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Bot Settings (Admin)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_bot_settings(self):
+        """Test user bot settings endpoint"""
+        if not self.user_token:
+            self.log_test("User Bot Settings", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/user/bot-settings", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['opening_message', 'prompt', 'model', 'temperature']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("User Bot Settings", True, 
+                                "User can retrieve bot settings with category fallback",
+                                f"Model: {data.get('model')}, Message: {data.get('opening_message')[:50]}...")
+                    return True
+                else:
+                    self.log_test("User Bot Settings", False, 
+                                f"Missing fields in user bot settings: {missing_fields}")
+                    return False
+            else:
+                self.log_test("User Bot Settings", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Bot Settings", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_csv_upload_sales_user(self):
+        """Test CSV upload for sales category user (should work)"""
+        # First, we need to create a sales user or use admin (who is sales category)
+        if not self.admin_token:
+            self.log_test("CSV Upload (Sales User)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create a test CSV content
+            csv_content = "name,phone,email,company,notes\nJohn Doe,555-1234,john@example.com,Acme Corp,Interested in product\nJane Smith,555-5678,jane@example.com,Tech Inc,Follow up needed"
+            
+            # Create file-like object
+            files = {
+                'file': ('test_leads.csv', io.StringIO(csv_content), 'text/csv')
+            }
+            
+            response = self.session.post(f"{self.api_url}/user/upload-leads", 
+                                       files=files, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and data.get('leads_imported', 0) > 0:
+                    self.log_test("CSV Upload (Sales User)", True, 
+                                f"CSV upload successful: {data.get('leads_imported')} leads imported",
+                                f"Message: {data.get('message')}")
+                    return True
+                else:
+                    self.log_test("CSV Upload (Sales User)", False, 
+                                f"Upload failed: {data.get('message')}")
+                    return False
+            else:
+                self.log_test("CSV Upload (Sales User)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("CSV Upload (Sales User)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_csv_upload_non_sales_user(self):
+        """Test CSV upload for non-sales category user (should fail)"""
+        if not self.user_token:
+            self.log_test("CSV Upload (Non-Sales User)", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            
+            # Create a test CSV content
+            csv_content = "name,phone,email,company,notes\nJohn Doe,555-1234,john@example.com,Acme Corp,Interested in product"
+            
+            # Create file-like object
+            files = {
+                'file': ('test_leads.csv', io.StringIO(csv_content), 'text/csv')
+            }
+            
+            response = self.session.post(f"{self.api_url}/user/upload-leads", 
+                                       files=files, headers=headers, timeout=10)
+            
+            if response.status_code == 403:
+                self.log_test("CSV Upload (Non-Sales User)", True, 
+                            "Non-sales user correctly denied CSV upload access")
+                return True
+            else:
+                self.log_test("CSV Upload (Non-Sales User)", False, 
+                            f"Expected 403, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("CSV Upload (Non-Sales User)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_call_logs(self):
+        """Test user call logs endpoint (should not include revenue)"""
+        if not self.user_token:
+            self.log_test("User Call Logs", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/user/call-logs", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    # Check that revenue data is not included
+                    has_revenue = any('revenue_generated' in log for log in data)
+                    if not has_revenue:
+                        self.log_test("User Call Logs", True, 
+                                    f"Retrieved {len(data)} call logs without revenue data")
+                        return True
+                    else:
+                        self.log_test("User Call Logs", False, 
+                                    "Call logs include revenue data (security issue)")
+                        return False
+                else:
+                    self.log_test("User Call Logs", False, "Response is not a list")
+                    return False
+            else:
+                self.log_test("User Call Logs", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Call Logs", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_system_status(self):
+        """Test system status endpoint"""
+        if not self.user_token:
+            self.log_test("System Status", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/system/status", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['is_global_paused', 'user_status']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("System Status", True, 
+                                "System status retrieved successfully",
+                                f"Global paused: {data.get('is_global_paused')}, User status: {data.get('user_status')}")
+                    return True
+                else:
+                    self.log_test("System Status", False, 
+                                f"Missing fields in system status: {missing_fields}")
+                    return False
+            else:
+                self.log_test("System Status", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("System Status", False, f"Request failed: {str(e)}")
+            return False
+
     def run_all_tests(self):
-        """Run all authentication tests"""
-        print("🚀 Starting Authentication System Tests")
-        print("-" * 40)
+        """Run comprehensive API tests"""
+        print("🚀 Starting Comprehensive Production API Tests")
+        print("-" * 60)
         
         # Test 1: Backend connectivity
         if not self.test_backend_connectivity():
             print("\n❌ Backend connectivity failed. Stopping tests.")
             return self.generate_summary()
         
-        print()
+        print("\n📋 AUTHENTICATION TESTS")
+        print("-" * 30)
         
         # Test 2: Valid admin login
-        admin_token = self.test_login_valid_admin()
+        self.admin_token = self.test_login_valid_admin()
         
         # Test 3: Valid user login  
-        user_token = self.test_login_valid_user()
+        self.user_token = self.test_login_valid_user()
         
-        # Test 4: Invalid email
+        # Test 4: Invalid credentials
         self.test_login_invalid_email()
-        
-        # Test 5: Wrong password
         self.test_login_wrong_password()
         
-        print()
+        # Test 5: JWT token structure
+        if self.admin_token:
+            self.test_jwt_token_structure(self.admin_token)
         
-        # Test 6: JWT token structure (if we got a token)
-        if admin_token:
-            self.test_jwt_token_structure(admin_token)
+        print("\n🔐 ENHANCED AUTHENTICATION TESTS")
+        print("-" * 40)
         
-        print()
+        # Test 6: Enhanced /auth/me endpoints
+        self.test_enhanced_auth_me_admin()
+        self.test_enhanced_auth_me_user()
         
-        # Test 7: Protected endpoint with valid token
-        if admin_token:
-            self.test_protected_endpoint_with_token(admin_token)
+        # Test 7: PIN verification
+        self.test_pin_verification_admin()
+        self.test_pin_verification_user()
         
-        # Test 8: Protected endpoint without token
+        print("\n👑 ADMIN MANAGEMENT TESTS")
+        print("-" * 30)
+        
+        # Test 8: Admin user management
+        self.test_admin_get_users()
+        self.test_user_access_admin_endpoint()
+        self.test_admin_overview()
+        
+        print("\n🤖 BOT SETTINGS TESTS")
+        print("-" * 25)
+        
+        # Test 9: Bot settings management
+        self.test_bot_settings_admin()
+        self.test_user_bot_settings()
+        
+        print("\n📊 USER OPERATIONS TESTS")
+        print("-" * 30)
+        
+        # Test 10: User operations
+        self.test_csv_upload_sales_user()
+        self.test_csv_upload_non_sales_user()
+        self.test_user_call_logs()
+        self.test_system_status()
+        
+        # Test 11: Protected endpoints
+        self.test_protected_endpoint_with_token(self.admin_token)
         self.test_protected_endpoint_without_token()
-        
-        # Test 9: Protected endpoint with invalid token
         self.test_protected_endpoint_invalid_token()
         
         return self.generate_summary()
