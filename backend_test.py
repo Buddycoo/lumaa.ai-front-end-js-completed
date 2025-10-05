@@ -61,21 +61,27 @@ class PostgreSQLAPITester:
         })
         
     def test_backend_connectivity(self):
-        """Test if backend is responding"""
+        """Test if PostgreSQL backend is responding"""
         try:
             response = self.session.get(f"{self.api_url}/", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                self.log_test("Backend Connectivity", True, 
-                            f"Backend responding correctly", 
-                            f"Response: {data}")
-                return True
+                expected_message = "Hello World - PostgreSQL"
+                if data.get("message") == expected_message:
+                    self.log_test("PostgreSQL Backend Connectivity", True, 
+                                f"PostgreSQL backend responding correctly", 
+                                f"Response: {data}")
+                    return True
+                else:
+                    self.log_test("PostgreSQL Backend Connectivity", False, 
+                                f"Expected '{expected_message}', got: {data}")
+                    return False
             else:
-                self.log_test("Backend Connectivity", False, 
+                self.log_test("PostgreSQL Backend Connectivity", False, 
                             f"Unexpected status code: {response.status_code}")
                 return False
         except requests.exceptions.RequestException as e:
-            self.log_test("Backend Connectivity", False, 
+            self.log_test("PostgreSQL Backend Connectivity", False, 
                         f"Connection failed: {str(e)}")
             return False
     
