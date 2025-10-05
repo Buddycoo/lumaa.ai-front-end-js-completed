@@ -186,7 +186,7 @@ class Transaction(Base):
     user = relationship("User", back_populates="transactions")
 
 class SystemSettings(Base):
-    __tablename__ = "system_settings"
+    __tablename__ = "lumaa_system_settings"
     
     id = Column(String, primary_key=True, default=generate_uuid)
     is_global_paused = Column(Boolean, default=False)
