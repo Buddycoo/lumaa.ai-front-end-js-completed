@@ -153,10 +153,10 @@ class BotSettings(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
 class Payment(Base):
-    __tablename__ = "payments"
+    __tablename__ = "lumaa_payments"
     
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey('users.id'), nullable=False)
+    user_id = Column(String, ForeignKey('lumaa_users.id'), nullable=False)
     amount = Column(Float, nullable=False)
     transaction_type = Column(Enum(TransactionType), nullable=False)
     status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
