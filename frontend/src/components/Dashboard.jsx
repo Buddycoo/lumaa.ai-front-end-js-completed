@@ -27,6 +27,7 @@ const Dashboard = () => {
           <>
             <Route path="/" element={<Overview />} />
             <Route path="/users" element={<UserManagement />} />
+            <Route path="/send-updates" element={<AdminSendUpdates />} />
             <Route path="/settings" element={<BotSettings />} />
           </>
         ) : (
