@@ -93,10 +93,10 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user")
 
 class Lead(Base):
-    __tablename__ = "leads"
+    __tablename__ = "lumaa_leads"
     
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey('users.id'), nullable=False)
+    user_id = Column(String, ForeignKey('lumaa_users.id'), nullable=False)
     name = Column(String(255), nullable=False)
     phone = Column(String(50), nullable=False)
     email = Column(String(255), nullable=True)
