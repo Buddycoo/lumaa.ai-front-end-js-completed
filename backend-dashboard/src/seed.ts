@@ -42,7 +42,7 @@ async function main() {
   const createdUsers = [regularUser];
 
   // Create Bot Settings for all users
-  for (const user of [superAdmin, admin, ...createdUsers]) {
+  for (const user of [superAdmin, ...createdUsers]) {
     await prisma.botSetting.create({
       data: {
         userId: user.id,
