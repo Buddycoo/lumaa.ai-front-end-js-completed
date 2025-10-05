@@ -205,34 +205,34 @@ const Overview = () => {
         </div>
       </div>
       
-      {/* User Stats Cards */}
+      {/* User Stats Cards - NO REVENUE */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Calls Made"
-          value={stats.callsMade.toLocaleString()}
+          value={userStats.callsMade.toLocaleString()}
           icon={Phone}
-          trend="This month"
+          trend="Recent activity"
         />
         
         <StatsCard
           title="Pickup Rate"
-          value={`${stats.pickupRate}%`}
+          value={`${userStats.pickupRate}%`}
           icon={TrendingUp}
           trend="Success rate"
         />
         
         <StatsCard
-          title="Revenue Generated"
-          value={formatCurrency(stats.revenue)}
-          icon={DollarSign}
-          trend="Total earnings"
+          title="Category"
+          value={userStats.category.replace('_', ' ').toUpperCase()}
+          icon={BarChart3}
+          trend="Your specialization"
         />
         
         <StatsCard
           title="Minutes Used"
-          value={formatDuration(stats.minutesUsed)}
+          value={`${userStats.minutesUsed} / ${userStats.minutesAllocated}`}
           icon={Clock}
-          trend={`${formatDuration(stats.minutesLeft)} remaining`}
+          trend={`${userStats.minutesAllocated - userStats.minutesUsed} remaining`}
         />
       </div>
       
