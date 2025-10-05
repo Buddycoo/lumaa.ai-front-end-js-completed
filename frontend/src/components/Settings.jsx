@@ -60,7 +60,7 @@ const Settings = () => {
     setChangingPassword(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/api/auth/change-password', {
+      await axios.post('/auth/change-password', {
         current_password: passwordForm.current_password,
         new_password: passwordForm.new_password
       }, {
