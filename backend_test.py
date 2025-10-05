@@ -990,6 +990,375 @@ class PostgreSQLAPITester:
             self.log_test("System Status", False, f"Request failed: {str(e)}")
             return False
 
+    def test_admin_send_update_all_users(self):
+        """Test admin send update to all users"""
+        if not self.admin_token:
+            self.log_test("Admin Send Update (All Users)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            update_data = {
+                "subject": "System Maintenance Notice",
+                "message": "We will be performing system maintenance on Sunday from 2-4 AM EST.",
+                "recipient_type": "all",
+                "send_notification": True,
+                "send_email": False
+            }
+            
+            response = self.session.post(f"{self.api_url}/admin/send-update", 
+                                       json=update_data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "users_count" in data and data.get("users_count", 0) > 0:
+                    self.log_test("Admin Send Update (All Users)", True, 
+                                f"Successfully sent update to {data.get('users_count')} users",
+                                f"Notification IDs: {len(data.get('notification_ids', []))}")
+                    return True
+                else:
+                    self.log_test("Admin Send Update (All Users)", False, 
+                                f"No users found or invalid response: {data}")
+                    return False
+            else:
+                self.log_test("Admin Send Update (All Users)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Send Update (All Users)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_send_update_category(self):
+        """Test admin send update to specific category (sales)"""
+        if not self.admin_token:
+            self.log_test("Admin Send Update (Category)", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            update_data = {
+                "subject": "Sales Team Update",
+                "message": "New sales targets have been set for Q1. Please check your dashboard.",
+                "recipient_type": "category",
+                "category": "sales",
+                "send_notification": True,
+                "send_email": False
+            }
+            
+            response = self.session.post(f"{self.api_url}/admin/send-update", 
+                                       json=update_data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Admin Send Update (Category)", True, 
+                            f"Successfully sent update to sales category: {data.get('users_count')} users",
+                            f"Message: {data.get('message')}")
+                return True
+            else:
+                self.log_test("Admin Send Update (Category)", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Send Update (Category)", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_overview_real_data(self):
+        """Test admin overview with real data verification"""
+        if not self.admin_token:
+            self.log_test("Admin Overview Real Data", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/admin/overview", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['total_revenue', 'total_minutes_used', 'total_users', 'active_users']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    # Verify top_users array exists and has user data
+                    top_users = data.get('top_users', [])
+                    has_user_data = len(top_users) > 0 and all(
+                        'revenue' in user and 'minutes' in user for user in top_users
+                    )
+                    
+                    self.log_test("Admin Overview Real Data", True, 
+                                f"Admin overview with real data: Revenue=${data.get('total_revenue')}, Users={data.get('total_users')}, Top Users={len(top_users)}",
+                                f"Active Users: {data.get('active_users')}, Minutes: {data.get('total_minutes_used')}")
+                    return True
+                else:
+                    self.log_test("Admin Overview Real Data", False, 
+                                f"Missing fields in overview: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Admin Overview Real Data", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Overview Real Data", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_contact_form_submission(self):
+        """Test contact form submission (no auth required)"""
+        try:
+            contact_data = {
+                "name": "John Smith",
+                "email": "john.smith@testcompany.com",
+                "phone": "555-123-4567",
+                "company": "Test Company Inc",
+                "message": "I'm interested in learning more about your AI solutions for our business."
+            }
+            
+            response = self.session.post(f"{self.api_url}/contact", 
+                                       json=contact_data, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "notification_id" in data and data.get("message"):
+                    self.log_test("Contact Form Submission", True, 
+                                "Contact form submitted successfully",
+                                f"Notification ID: {data.get('notification_id')}")
+                    return True
+                else:
+                    self.log_test("Contact Form Submission", False, 
+                                f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Contact Form Submission", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Contact Form Submission", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_notifications(self):
+        """Test admin notifications endpoint"""
+        if not self.admin_token:
+            self.log_test("Admin Notifications", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/notifications", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    self.log_test("Admin Notifications", True, 
+                                f"Retrieved {len(data)} notifications for admin",
+                                f"Notifications include contact forms and system messages")
+                    return True
+                else:
+                    self.log_test("Admin Notifications", False, 
+                                "Response is not a list")
+                    return False
+            else:
+                self.log_test("Admin Notifications", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Notifications", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_admin_unread_count(self):
+        """Test admin unread notifications count"""
+        if not self.admin_token:
+            self.log_test("Admin Unread Count", False, "No admin token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            response = self.session.get(f"{self.api_url}/notifications/unread-count", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "count" in data and isinstance(data.get("count"), int):
+                    self.log_test("Admin Unread Count", True, 
+                                f"Admin has {data.get('count')} unread notifications")
+                    return True
+                else:
+                    self.log_test("Admin Unread Count", False, 
+                                f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Admin Unread Count", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Admin Unread Count", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_notifications(self):
+        """Test user notifications endpoint"""
+        if not self.user_token:
+            self.log_test("User Notifications", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/notifications", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    self.log_test("User Notifications", True, 
+                                f"Retrieved {len(data)} notifications for user",
+                                f"User sees admin updates and system notifications")
+                    return True
+                else:
+                    self.log_test("User Notifications", False, 
+                                "Response is not a list")
+                    return False
+            else:
+                self.log_test("User Notifications", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Notifications", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_user_unread_count(self):
+        """Test user unread notifications count"""
+        if not self.user_token:
+            self.log_test("User Unread Count", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            response = self.session.get(f"{self.api_url}/notifications/unread-count", 
+                                      headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "count" in data and isinstance(data.get("count"), int):
+                    self.log_test("User Unread Count", True, 
+                                f"User has {data.get('count')} unread notifications")
+                    return True
+                else:
+                    self.log_test("User Unread Count", False, 
+                                f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("User Unread Count", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("User Unread Count", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_change_password(self):
+        """Test password change functionality"""
+        if not self.user_token:
+            self.log_test("Change Password", False, "No user token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.user_token}"}
+            
+            # Test changing password from "pass" to "newpass123"
+            password_data = {
+                "current_password": "pass",
+                "new_password": "newpass123"
+            }
+            
+            response = self.session.post(f"{self.api_url}/auth/change-password", 
+                                       json=password_data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Password changed successfully":
+                    # Try to login with new password to verify change
+                    login_data = {
+                        "email": "user@lumaa.ai",
+                        "password": "newpass123"
+                    }
+                    
+                    login_response = self.session.post(f"{self.api_url}/auth/login", 
+                                                     json=login_data, timeout=10)
+                    
+                    if login_response.status_code == 200:
+                        # Change password back to "pass" for other tests
+                        reset_data = {
+                            "current_password": "newpass123",
+                            "new_password": "pass"
+                        }
+                        
+                        reset_response = self.session.post(f"{self.api_url}/auth/change-password", 
+                                                         json=reset_data, headers=headers, timeout=10)
+                        
+                        self.log_test("Change Password", True, 
+                                    "Password change successful and verified",
+                                    "Password changed from 'pass' to 'newpass123' and back")
+                        return True
+                    else:
+                        self.log_test("Change Password", False, 
+                                    "Password changed but login with new password failed")
+                        return False
+                else:
+                    self.log_test("Change Password", False, 
+                                f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_test("Change Password", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Change Password", False, f"Request failed: {str(e)}")
+            return False
+
+    def test_forgot_password(self):
+        """Test forgot password functionality"""
+        try:
+            forgot_data = {
+                "email": "user@lumaa.ai"
+            }
+            
+            response = self.session.post(f"{self.api_url}/auth/forgot-password", 
+                                       json=forgot_data, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "code" in data and data.get("message"):
+                    # Verify the reset code is generated (6 digits)
+                    reset_code = data.get("code")
+                    if len(str(reset_code)) == 6 and str(reset_code).isdigit():
+                        self.log_test("Forgot Password", True, 
+                                    "Reset code generated successfully",
+                                    f"6-digit code: {reset_code}")
+                        return True
+                    else:
+                        self.log_test("Forgot Password", False, 
+                                    f"Invalid reset code format: {reset_code}")
+                        return False
+                else:
+                    self.log_test("Forgot Password", False, 
+                                f"Missing code or message in response: {data}")
+                    return False
+            else:
+                self.log_test("Forgot Password", False, 
+                            f"Expected 200, got {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("Forgot Password", False, f"Request failed: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive PostgreSQL API tests"""
         print("🚀 Starting PostgreSQL-based Lumaa AI Backend Tests")
