@@ -107,6 +107,28 @@ class UserBotSettings(BaseModel):
     prompt: str = Field(max_length=2000)
     updated_at: datetime
 
+class Payment(BaseModel):
+    id: str
+    user_id: str
+    amount: float
+    transaction_type: TransactionType
+    status: PaymentStatus = PaymentStatus.PENDING
+    payment_link: Optional[str] = None
+    payment_reference: Optional[str] = None
+    due_date: datetime
+    paid_date: Optional[datetime] = None
+    created_at: datetime
+
+class Transaction(BaseModel):
+    id: str
+    user_id: str
+    amount: float
+    transaction_type: TransactionType
+    description: str
+    credits_before: float
+    credits_after: float
+    created_at: datetime
+
 class SystemSettings(BaseModel):
     id: str
     is_global_paused: bool = False
