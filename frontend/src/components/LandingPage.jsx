@@ -127,7 +127,15 @@ const LandingPage = () => {
     }, 5000);
   };
 
-  const scrollToSection = (sectionId) => {\n    // Track navigation clicks\n    trackButtonClick(`Navigate to ${sectionId}`, 'Header Navigation');\n    \n    const element = document.getElementById(sectionId);\n    if (element) {\n      element.scrollIntoView({ behavior: 'smooth' });\n    }\n  };
+  const scrollToSection = (sectionId) => {
+    // Track navigation clicks
+    trackButtonClick(`Navigate to ${sectionId}`, 'Header Navigation');
+    
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="dark-container">
