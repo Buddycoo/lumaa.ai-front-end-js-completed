@@ -27,6 +27,15 @@ def run_migration():
             conn.commit()
             print("✅ Password reset columns added successfully")
             
+            # Add pause_reason to lumaa_users
+            print("Adding pause_reason column to lumaa_users...")
+            conn.execute(text("""
+                ALTER TABLE lumaa_users 
+                ADD COLUMN IF NOT EXISTS pause_reason VARCHAR(500)
+            """))
+            conn.commit()
+            print("✅ Pause reason column added successfully")
+            
             # Create lumaa_notifications table
             print("Creating lumaa_notifications table...")
             conn.execute(text("""
