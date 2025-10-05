@@ -154,6 +154,26 @@ class PostgreSQLManager:
             session.close()
 
 
+
+    async def authenticate_user(self, email: str, password: str) -> Optional[Dict]:
+        """Authenticate user - Allow paused users to login"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.email == email).first()
+            if not user:
+                return None
+            
+            # Simplified password check for demo (always accept "pass")
+            if password != "pass":
+                return None
+            
+            # Allow paused users to login - they will see blocking UI in frontend
+            # Do NOT check status here
+            
+            return self._user_to_dict(user)
+        finally:
+            session.close()
+
     async def update_user_status(self, user_id: str, status: 'UserStatus', updated_by: str, pause_reason: Optional[str] = None) -> bool:
         """Update user status and pause reason"""
         session = self.get_session()
