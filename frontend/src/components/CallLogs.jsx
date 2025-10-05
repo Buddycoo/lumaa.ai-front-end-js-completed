@@ -148,8 +148,8 @@ const CallLogs = () => {
                     <Phone className="h-5 w-5 text-[#00FFD1]" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{call.number}</p>
-                    <p className="text-sm text-gray-400">{call.project}</p>
+                    <p className="text-white font-medium">{call.leadName}</p>
+                    <p className="text-sm text-gray-400">{call.leadPhone}</p>
                     <p className="text-xs text-gray-500">{call.timestamp}</p>
                   </div>
                 </div>
@@ -164,16 +164,8 @@ const CallLogs = () => {
                   </div>
                   
                   <div className="text-center">
-                    <div className="flex items-center gap-1 text-gray-300">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="text-sm">{call.cost.toFixed(2)}</span>
-                    </div>
-                    <p className="text-xs text-gray-500">Cost (AED)</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(call.status)}`}>
-                      {call.status}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getOutcomeColor(call.callOutcome)}`}>
+                      {call.callOutcome}
                     </span>
                   </div>
                   
