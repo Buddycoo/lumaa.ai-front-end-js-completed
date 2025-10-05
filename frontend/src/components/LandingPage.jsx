@@ -175,11 +175,25 @@ const LandingPage = () => {
               {/* Right - Spline 3D Animation */}
               <div className="flex justify-center">
                 <div className="w-[700px] h-[700px] overflow-visible relative">
-                  {splineLoaded && (
+                  {splineLoaded ? (
+                    <Suspense fallback={
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="text-brand-primary text-center">
+                          <div className="w-32 h-32 border-2 border-brand-primary rounded-full animate-pulse mb-4 mx-auto"></div>
+                          <p className="body-medium">Loading 3D Experience...</p>
+                        </div>
+                      </div>
+                    }>
+                      <Spline 
+                        scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode"
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    </Suspense>
+                  ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <div className="text-brand-primary text-center">
                         <div className="w-32 h-32 border-2 border-brand-primary rounded-full animate-pulse mb-4 mx-auto"></div>
-                        <p className="body-medium">Loading 3D Experience...</p>
+                        <p className="body-medium">Initializing...</p>
                       </div>
                     </div>
                   )}
