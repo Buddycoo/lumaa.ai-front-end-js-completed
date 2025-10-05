@@ -78,8 +78,8 @@ const CallLogs = () => {
         </Button>
       </div>
       
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Summary Cards - NO COST/REVENUE */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-gray-900 border-gray-800">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -110,10 +110,10 @@ const CallLogs = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Total Cost</p>
-                <p className="text-2xl font-bold text-white">AED 234.50</p>
+                <p className="text-sm text-gray-400">Total Duration</p>
+                <p className="text-2xl font-bold text-white">12h 34m</p>
               </div>
-              <DollarSign className="h-8 w-8 text-[#00FFD1]" />
+              <Clock className="h-8 w-8 text-[#00FFD1]" />
             </div>
           </CardContent>
         </Card>
