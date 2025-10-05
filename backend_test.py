@@ -834,7 +834,7 @@ class ComprehensiveAPITester:
         }
 
 if __name__ == "__main__":
-    tester = AuthenticationTester(BACKEND_URL)
+    tester = ComprehensiveAPITester(BACKEND_URL)
     summary = tester.run_all_tests()
     
     # Exit with error code if tests failed
