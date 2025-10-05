@@ -112,12 +112,7 @@ const LandingPage = () => {
         setFormData({ name: '', email: '', company: '', phone: '', message: '' });
       } else {\n        setSubmitStatus('error');\n        trackFormSubmission('demo_request', false);\n      }\n    } catch (error) {\n      setSubmitStatus('error');\n      trackFormSubmission('demo_request', false);\n    }\n    \n    setIsSubmitting(false);\n    \n    // Clear status after 5 seconds\n    setTimeout(() => {\n      setSubmitStatus(null);\n    }, 5000);\n  };
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const scrollToSection = (sectionId) => {\n    // Track navigation clicks\n    trackButtonClick(`Navigate to ${sectionId}`, 'Header Navigation');\n    \n    const element = document.getElementById(sectionId);\n    if (element) {\n      element.scrollIntoView({ behavior: 'smooth' });\n    }\n  };
 
   return (
     <div className="dark-container">
