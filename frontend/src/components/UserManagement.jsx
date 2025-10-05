@@ -364,7 +364,6 @@ const UserManagement = () => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
       
       {/* Search */}
       <Card className="bg-gray-900 border-gray-800">
