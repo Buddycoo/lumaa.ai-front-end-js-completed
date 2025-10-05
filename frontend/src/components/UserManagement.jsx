@@ -96,11 +96,7 @@ const UserManagement = () => {
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ); 
-      minutesLeft: 1910.3,
-      lastActive: '3 days ago'
-    }
-  ];
+  );
   
   if (!isAdmin) {
     return (
