@@ -14,13 +14,27 @@ const Dashboard = () => {
     return <Navigate to="/login" replace />;
   }
   
+  // For now, use existing components but we'll modify them to match refined requirements
+  const isAdmin = user?.role === 'admin';
+  
   return (
     <DashboardLayout>
       <Routes>
-        <Route path="/" element={<Overview />} />
-        <Route path="/calls" element={<CallLogs />} />
-        <Route path="/settings" element={<BotSettings />} />
-        <Route path="/users" element={<UserManagement />} />
+        {isAdmin ? (
+          // Admin routes - NO call logs, focus on user management
+          <>
+            <Route path="/" element={<Overview />} />
+            <Route path="/users" element={<UserManagement />} />
+            <Route path="/settings" element={<BotSettings />} />
+          </>
+        ) : (
+          // User routes - NO revenue anywhere, lead details only
+          <>
+            <Route path="/" element={<Overview />} />
+            <Route path="/calls" element={<CallLogs />} />
+            <Route path="/settings" element={<BotSettings />} />
+          </>
+        )}
       </Routes>
     </DashboardLayout>
   );
