@@ -207,7 +207,7 @@ async def get_category_bot_settings(
 @router.put("/admin/bot-settings/{category}", response_model=dict)
 async def update_category_bot_settings(
     category: str,
-    settings_data: BotSettingsUpdateRequest,
+    settings_data: AdminBotSettingsUpdateRequest,
     admin_user: dict = Depends(get_admin_user),
     pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
 ):
