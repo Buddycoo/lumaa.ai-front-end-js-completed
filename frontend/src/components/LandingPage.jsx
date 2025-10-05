@@ -509,10 +509,19 @@ const LandingPage = () => {
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="btn-primary w-full"
+                  className="btn-primary w-full transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  {isSubmitting ? 'Sending...' : contactData.cta}
-                  {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Sending...
+                    </div>
+                  ) : (
+                    <>
+                      {contactData.cta}
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
                 </Button>
               </form>
             </Card>
