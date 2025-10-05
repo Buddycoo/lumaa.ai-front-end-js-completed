@@ -325,6 +325,157 @@ class DatabaseManager:
             return self._parse_from_mongo(settings)
         return {"is_global_paused": False}
 
+    # Payment & Billing Methods
+    async def create_payment(self, user_id: str, amount: float, transaction_type: str, description: str) -> str:
+        """Create a payment record"""
+        payment_id = self._generate_id()
+        
+        # Calculate due date (immediate for top-ups, next month for subscriptions)
+        due_date = datetime.now(timezone.utc)
+        if transaction_type == "monthly_bill":
+            due_date = due_date.replace(day=1, month=due_date.month+1 if due_date.month < 12 else 1)
+        
+        payment_doc = {
+            "id": payment_id,
+            "user_id": user_id,
+            "amount": amount,
+            "transaction_type": transaction_type,
+            "status": "pending",
+            "description": description,
+            "due_date": due_date.isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await self.db.payments.insert_one(payment_doc)
+        return payment_id
+    
+    async def process_payment(self, payment_id: str, payment_reference: str) -> bool:
+        """Process payment and update user credits"""
+        payment = await self.db.payments.find_one({"id": payment_id})
+        if not payment:
+            return False
+        
+        # Update payment status
+        await self.db.payments.update_one(
+            {"id": payment_id},
+            {
+                "$set": {
+                    "status": "paid",
+                    "payment_reference": payment_reference,
+                    "paid_date": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        # Add credits to user account
+        user = await self.get_user_by_id(payment["user_id"])
+        if user:
+            new_balance = user.get("credits_balance", 0) + payment["amount"]
+            await self.users.update_one(
+                {"id": payment["user_id"]},
+                {"$set": {"credits_balance": new_balance}}
+            )
+            
+            # Create transaction record
+            await self.create_transaction(
+                user_id=payment["user_id"],
+                amount=payment["amount"],
+                transaction_type=payment["transaction_type"],
+                description=f"Payment processed: {payment['description']}",
+                credits_before=user.get("credits_balance", 0),
+                credits_after=new_balance
+            )
+        
+        return True
+    
+    async def create_transaction(self, user_id: str, amount: float, transaction_type: str, description: str, credits_before: float, credits_after: float):
+        """Create transaction record"""
+        transaction_doc = {
+            "id": self._generate_id(),
+            "user_id": user_id,
+            "amount": amount,
+            "transaction_type": transaction_type,
+            "description": description,
+            "credits_before": credits_before,
+            "credits_after": credits_after,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await self.db.transactions.insert_one(transaction_doc)
+    
+    async def create_payment_link(self, user_id: str, amount: float, description: str) -> str:
+        """Create payment with link for admin to send"""
+        payment_id = await self.create_payment(user_id, amount, "monthly_bill", description)
+        
+        payment_link = f"https://lumaa.ai/pay/{payment_id}"
+        await self.db.payments.update_one(
+            {"id": payment_id},
+            {"$set": {"payment_link": payment_link}}
+        )
+        
+        return payment_id
+    
+    async def get_user_payments(self, user_id: str) -> List[dict]:
+        """Get payment history for user"""
+        payments = await self.db.payments.find({"user_id": user_id}).sort("created_at", -1).to_list(length=None)
+        return [self._parse_from_mongo(payment) for payment in payments]
+    
+    async def get_user_transactions(self, user_id: str) -> List[dict]:
+        """Get transaction history for user"""
+        transactions = await self.db.transactions.find({"user_id": user_id}).sort("created_at", -1).to_list(length=None)
+        return [self._parse_from_mongo(transaction) for transaction in transactions]
+    
+    async def get_all_payments(self) -> List[dict]:
+        """Get all payments for admin"""
+        payments = await self.db.payments.find({}).sort("created_at", -1).to_list(length=None)
+        
+        # Add user names
+        for payment in payments:
+            user = await self.get_user_by_id(payment["user_id"])
+            payment["user_name"] = user["name"] if user else "Unknown"
+            
+        return [self._parse_from_mongo(payment) for payment in payments]
+    
+    async def get_users_payment_due(self, days: int = 3) -> List[dict]:
+        """Get users with payment due in X days"""
+        from datetime import timedelta
+        
+        target_date = datetime.now(timezone.utc) + timedelta(days=days)
+        
+        users = await self.users.find({
+            "next_billing_date": {"$lte": target_date.isoformat()},
+            "payment_status": {"$ne": "paid"},
+            "role": {"$ne": "admin"}
+        }).to_list(length=None)
+        
+        return [self._parse_from_mongo(user) for user in users]
+    
+    async def edit_user(self, user_id: str, update_data) -> bool:
+        """Edit user details (admin function)"""
+        update_fields = {}
+        
+        if update_data.name:
+            update_fields["name"] = update_data.name
+        if update_data.email:
+            update_fields["email"] = update_data.email
+        if update_data.category:
+            update_fields["category"] = update_data.category
+        if update_data.minutes_allocated is not None:
+            update_fields["minutes_allocated"] = update_data.minutes_allocated
+        if update_data.monthly_plan_cost is not None:
+            update_fields["monthly_plan_cost"] = update_data.monthly_plan_cost
+        if update_data.status:
+            update_fields["status"] = update_data.status
+        
+        update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await self.users.update_one(
+            {"id": user_id},
+            {"$set": update_fields}
+        )
+        
+        return result.modified_count > 0
+
     # Analytics for Admin Dashboard
     async def get_admin_overview(self) -> dict:
         """Get overview data for admin dashboard"""
