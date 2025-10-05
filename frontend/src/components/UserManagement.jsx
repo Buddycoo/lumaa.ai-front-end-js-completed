@@ -114,6 +114,14 @@ const UserManagement = () => {
     );
   }
   
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-white">Loading users...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -125,28 +133,113 @@ const UserManagement = () => {
             Manage user accounts and permissions
           </p>
         </div>
-        <Button className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
+        
+        <Dialog open={addUserModal} onOpenChange={setAddUserModal}>
+          <DialogTrigger asChild>
+            <Button className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Add User
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-gray-900 border-gray-800">
+            <DialogHeader>
+              <DialogTitle className="text-white">Add New User</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="text-gray-300">Full Name</Label>
+                <Input
+                  id="name"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="email" className="text-gray-300">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="category" className="text-gray-300">Category</Label>
+                <Select value={newUser.category} onValueChange={(value) => setNewUser({...newUser, category: value})}>
+                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700">
+                    {categories.map(cat => (
+                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="pin" className="text-gray-300">PIN Code (4-6 digits)</Label>
+                <Input
+                  id="pin"
+                  value={newUser.pin_code}
+                  onChange={(e) => setNewUser({...newUser, pin_code: e.target.value.replace(/[^0-9]/g, '')})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  placeholder="Enter PIN"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="minutes" className="text-gray-300">Minutes Allocated</Label>
+                <Input
+                  id="minutes"
+                  type="number"
+                  value={newUser.minutes_allocated}
+                  onChange={(e) => setNewUser({...newUser, minutes_allocated: parseInt(e.target.value)})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  placeholder="1000"
+                  required
+                />
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <Button type="submit" className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
+                  Create User
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setAddUserModal(false)}
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
       
-      {/* Search and Filters */}
+      {/* Search */}
       <Card className="bg-gray-900 border-gray-800">
         <CardContent className="p-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search users by name or email..."
-                className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-              />
-            </div>
-            <select className="h-10 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white">
-              <option value="all">All Roles</option>
-              <option value="USER">Users</option>
-              <option value="ADMIN">Admins</option>
-            </select>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+            />
           </div>
         </CardContent>
       </Card>
