@@ -81,10 +81,8 @@ async function main() {
 
   // Create Bot Settings for all users
   for (const user of [superAdmin, admin, ...createdUsers]) {
-    await prisma.botSetting.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: {
+    await prisma.botSetting.create({
+      data: {
         userId: user.id,
         openingMessage: `Hello! I'm your AI assistant from Lumaa AI. How can I help you today?`,
         model: 'GPT-4.1',
