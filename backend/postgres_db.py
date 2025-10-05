@@ -43,6 +43,8 @@ class PostgreSQLManager:
                 pin_code=user_data["pin_code"],
                 function=user_data.get("function"),
                 sip_endpoint=user_data.get("sip_endpoint"),
+                sip_endpoints=user_data.get("sip_endpoints"),
+                concurrency=user_data.get("concurrency", 5),
                 prompt=user_data.get("prompt"),
                 min_subscribed=user_data.get("min_subscribed", 1000),
                 min_used=user_data.get("min_used", 0),
