@@ -7,36 +7,20 @@ async function main() {
   console.log('🌱 Starting database seed...');
 
   // Create SuperAdmin
-  const superAdminPassword = await bcrypt.hash('admin123', 12);
+  const superAdminPassword = await bcrypt.hash('pass', 12);
   const superAdmin = await prisma.user.upsert({
     where: { email: 'admin@lumaa.ai' },
     update: {},
     create: {
-      name: 'Super Admin',
+      name: 'Admin Dashboard',
       email: 'admin@lumaa.ai',
       password: superAdminPassword,
-      role: 'SUPERADMIN',
+      role: 'ADMIN',
       minutesLeft: 10000,
       isActive: true
     }
   });
-  console.log('✅ Created SuperAdmin:', superAdmin.email);
-
-  // Create Admin
-  const adminPassword = await bcrypt.hash('admin123', 12);
-  const admin = await prisma.user.upsert({
-    where: { email: 'manager@lumaa.ai' },
-    update: {},
-    create: {
-      name: 'Admin Manager',
-      email: 'manager@lumaa.ai',
-      password: adminPassword,
-      role: 'ADMIN',
-      minutesLeft: 5000,
-      isActive: true
-    }
-  });
-  console.log('✅ Created Admin:', admin.email);
+  console.log('✅ Created Admin:', superAdmin.email);
 
   // Create Test Users
   const users = [
