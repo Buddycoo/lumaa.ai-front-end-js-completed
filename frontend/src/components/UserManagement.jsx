@@ -90,15 +90,90 @@ const UserManagement = () => {
     }
   };
 
+  const pauseReasons = [
+    'Payment Overdue',
+    'Terms Violation',
+    'System Maintenance',
+    'Suspicious Activity',
+    'Account Under Review',
+    'Other'
+  ];
+
   const handleToggleUserStatus = async (userId, currentStatus) => {
+    if (currentStatus === 'active') {
+      // Show pause modal with reason and PIN
+      setUserToPause(userId);
+      setPauseModal(true);
+    } else {
+      // Resume user directly
+      try {
+        await axios.post(`/admin/users/${userId}/resume`);
+        toast.success('User resumed successfully');
+        fetchUsers();
+      } catch (error) {
+        toast.error('Failed to resume user');
+      }
+    }
+  };
+
+  const handlePauseUser = async (e) => {
+    e.preventDefault();
+    
+    if (!pauseData.reason) {
+      toast.error('Please select a reason');
+      return;
+    }
+    
+    if (pauseData.admin_pin !== '1509') {
+      toast.error('Invalid admin PIN');
+      return;
+    }
+    
     try {
-      const action = currentStatus === 'active' ? 'pause' : 'resume';
-      await axios.post(`/admin/users/${userId}/${action}`);
-      
-      toast.success(`User ${action}d successfully`);
-      fetchUsers(); // Refresh the list
+      await axios.post(`/admin/users/${userToPause}/pause`, pauseData);
+      toast.success('User paused successfully');
+      setPauseModal(false);
+      setPauseData({ reason: '', admin_pin: '' });
+      setUserToPause(null);
+      fetchUsers();
     } catch (error) {
-      toast.error(`Failed to ${action} user`);
+      toast.error(error.response?.data?.detail || 'Failed to pause user');
+    }
+  };
+
+  const handlePauseAllUsers = async (e) => {
+    e.preventDefault();
+    
+    if (!pauseData.reason) {
+      toast.error('Please select a reason');
+      return;
+    }
+    
+    if (pauseData.admin_pin !== '1509') {
+      toast.error('Invalid admin PIN');
+      return;
+    }
+    
+    try {
+      const response = await axios.post('/admin/users/pause-all', pauseData);
+      toast.success(`${response.data.count} users paused successfully`);
+      setPauseAllModal(false);
+      setPauseData({ reason: '', admin_pin: '' });
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to pause users');
+    }
+  };
+
+  const handleResumeAllUsers = async () => {
+    if (!window.confirm('Resume all paused users?')) return;
+    
+    try {
+      const response = await axios.post('/admin/users/resume-all');
+      toast.success(`${response.data.count} users resumed successfully`);
+      fetchUsers();
+    } catch (error) {
+      toast.error('Failed to resume users');
     }
   };
 
