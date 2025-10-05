@@ -35,7 +35,7 @@ model CallLog {
   number     String
   duration   Float      // in minutes
   cost       Float      // in AED
-  status     CallStatus
+  status     String
   evaluation String?    // AI evaluation result
   project    String?
   transcript String?    // Full call transcript
