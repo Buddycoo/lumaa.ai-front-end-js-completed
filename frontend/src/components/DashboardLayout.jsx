@@ -75,7 +75,7 @@ const DashboardLayout = ({ children }) => {
           {/* Navigation Menu */}
           <nav className="flex-1 p-4">
             <div className="space-y-2">
-              {menuItems.map((item) => {
+              {visibleMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink
