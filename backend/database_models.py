@@ -66,6 +66,8 @@ class User(Base):
     # Expanded user fields as requested
     function = Column(String(255), nullable=True)  # User's job function
     sip_endpoint = Column(String(255), nullable=True)  # SIP endpoint for calls
+    sip_endpoints = Column(String(500), nullable=True)  # Multiple SIP endpoints (comma-separated)
+    concurrency = Column(Integer, default=5)  # Concurrent call limit
     prompt = Column(Text, nullable=True)  # User's custom prompt
     
     # Subscription & Usage
