@@ -110,7 +110,22 @@ const LandingPage = () => {
         trackPixelLead(100); // Assign lead value
         
         setFormData({ name: '', email: '', company: '', phone: '', message: '' });
-      } else {\n        setSubmitStatus('error');\n        trackFormSubmission('demo_request', false);\n      }\n    } catch (error) {\n      setSubmitStatus('error');\n      trackFormSubmission('demo_request', false);\n    }\n    \n    setIsSubmitting(false);\n    \n    // Clear status after 5 seconds\n    setTimeout(() => {\n      setSubmitStatus(null);\n    }, 5000);\n  };
+      } else {
+        setSubmitStatus('error');
+        trackFormSubmission('demo_request', false);
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      trackFormSubmission('demo_request', false);
+    }
+    
+    setIsSubmitting(false);
+    
+    // Clear status after 5 seconds
+    setTimeout(() => {
+      setSubmitStatus(null);
+    }, 5000);
+  };
 
   const scrollToSection = (sectionId) => {\n    // Track navigation clicks\n    trackButtonClick(`Navigate to ${sectionId}`, 'Header Navigation');\n    \n    const element = document.getElementById(sectionId);\n    if (element) {\n      element.scrollIntoView({ behavior: 'smooth' });\n    }\n  };
 
