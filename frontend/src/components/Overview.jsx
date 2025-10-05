@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { useAuthStore } from '../store/authStore';
+import axios from 'axios';
+import { toast } from 'sonner';
 import {
   Phone,
   TrendingUp,
@@ -17,37 +19,71 @@ const Overview = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
   
-  // Mock stats data based on refined requirements
-  const adminStats = {
-    totalRevenue: 15600,     // Admins see revenue
-    totalMinutes: 2456,
-    totalUsers: 12,
-    activeUsers: 8,
-    topUsersByRevenue: [
-      { name: 'John Smith', revenue: 4500 },
-      { name: 'Sarah Johnson', revenue: 3200 }
-    ],
-    topUsersByMinutes: [
-      { name: 'Mike Wilson', minutes: 456 },
-      { name: 'Lisa Brown', minutes: 389 }
-    ]
-  };
-  
-  // User stats - NO REVENUE anywhere
-  const userStats = {
-    callsMade: 156,
-    pickupRate: 89,          // Success rate percentage
-    minutesUsed: user?.minutes_used || 234,
+  const [loading, setLoading] = useState(true);
+  const [adminStats, setAdminStats] = useState(null);
+  const [userStats, setUserStats] = useState({
+    callsMade: 0,
+    pickupRate: 0,
+    minutesUsed: user?.minutes_used || 0,
     minutesAllocated: user?.minutes_allocated || 1000,
     category: user?.category || 'real_estate',
     botStatus: user?.status || 'active'
+  });
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchAdminOverview();
+    } else {
+      fetchUserStats();
+    }
+  }, [isAdmin]);
+
+  const fetchAdminOverview = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/api/admin/overview', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAdminStats(response.data);
+    } catch (error) {
+      console.error('Failed to fetch admin overview:', error);
+      toast.error('Failed to load overview data');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // System status for admin
-  const systemStatus = {
-    ai: true,
-    calls: true,
-    whatsapp: false
+  const fetchUserStats = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Fetch call logs to calculate stats
+      const callLogsResponse = await axios.get('/api/user/call-logs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const callLogs = callLogsResponse.data;
+      const totalCalls = callLogs.length;
+      const successfulCalls = callLogs.filter(log => 
+        log.call_outcome === 'interested' || log.call_outcome === 'callback'
+      ).length;
+      const pickupRate = totalCalls > 0 ? Math.round((successfulCalls / totalCalls) * 100) : 0;
+      
+      setUserStats({
+        callsMade: totalCalls,
+        pickupRate: pickupRate,
+        minutesUsed: user?.minutes_used || 0,
+        minutesAllocated: user?.minutes_allocated || 1000,
+        category: user?.category || 'real_estate',
+        botStatus: user?.status || 'active'
+      });
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+    } finally {
+      setLoading(false);
+    }
   };
   
   const StatsCard = ({ title, value, icon: Icon, trend, trendUp, className = '' }) => {
