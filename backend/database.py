@@ -251,7 +251,7 @@ class DatabaseManager:
     # Bot Settings
     async def get_category_bot_settings(self, category: UserCategory) -> Optional[dict]:
         """Get bot settings for a category"""
-        settings = await self.bot_settings.find_one({"category": category})
+        settings = await self.bot_settings.find_one({"category": category}, {"_id": 0})
         if settings:
             return self._parse_from_mongo(settings)
         return None
