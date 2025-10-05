@@ -265,6 +265,56 @@ class TokenResponse(BaseModel):
     accessToken: str
     refreshToken: str
 
+
+class BotSettingsResponse(BaseModel):
+    id: str
+    category: str
+    model: str
+    temperature: float
+    opening_message: Optional[str] = None
+    prompt: Optional[str] = None
+    system_prompt: Optional[str] = None
+    is_active: bool
+    updated_by_admin: str
+    updated_at: datetime
+
+class UserBotSettingsResponse(BaseModel):
+    opening_message: Optional[str] = None
+    prompt: Optional[str] = None
+    model: str
+    temperature: float
+
+class UserBotSettingsUpdateRequest(BaseModel):
+    opening_message: Optional[str] = Field(None, max_length=500)
+    prompt: Optional[str] = Field(None, max_length=2000)
+
+class LeadResponse(BaseModel):
+    id: str
+    user_id: str
+    name: str
+    phone: str
+    email: Optional[str] = None
+    company: Optional[str] = None
+    notes: Optional[str] = None
+    status: str
+    created_at: datetime
+
+class LeadCreateRequest(BaseModel):
+    name: str
+    phone: str
+    email: Optional[str] = None
+    company: Optional[str] = None
+    notes: Optional[str] = None
+
+class TopUserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    revenue: float
+    minutes_used: int
+    category: str
+
+
 class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
