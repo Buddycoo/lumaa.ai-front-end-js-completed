@@ -247,13 +247,32 @@ const UserManagement = () => {
           </p>
         </div>
         
-        <Dialog open={addUserModal} onOpenChange={setAddUserModal}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleResumeAllUsers}
+            variant="outline"
+            className="bg-green-600/20 border-green-600 text-green-400 hover:bg-green-600/30"
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Resume All
+          </Button>
+          
+          <Button 
+            onClick={() => setPauseAllModal(true)}
+            variant="outline"
+            className="bg-yellow-600/20 border-yellow-600 text-yellow-400 hover:bg-yellow-600/30"
+          >
+            <Pause className="h-4 w-4 mr-2" />
+            Pause All
+          </Button>
+          
+          <Dialog open={addUserModal} onOpenChange={setAddUserModal}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </DialogTrigger>
           <DialogContent className="bg-gray-900 border-gray-800">
             <DialogHeader>
               <DialogTitle className="text-white">Add New User</DialogTitle>
