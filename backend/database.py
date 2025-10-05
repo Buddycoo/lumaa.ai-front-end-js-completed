@@ -77,7 +77,7 @@ class DatabaseManager:
 
     async def get_user_by_id(self, user_id: str) -> Optional[dict]:
         """Get user by ID"""
-        user = await self.users.find_one({"id": user_id})
+        user = await self.users.find_one({"id": user_id}, {"_id": 0})
         if user:
             return self._parse_from_mongo(user)
         return None
