@@ -204,7 +204,7 @@ async def update_category_bot_settings(
     return {"message": "Bot settings updated successfully"}
 
 # User endpoints
-@router.get"/user/bot-settings", response_model=UserBotSettingsResponse)
+@router.get("/user/bot-settings", response_model=UserBotSettingsResponse)
 async def get_user_bot_settings(
     current_user: dict = Depends(get_current_user),
     pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
