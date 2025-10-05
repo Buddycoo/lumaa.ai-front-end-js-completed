@@ -131,6 +131,28 @@ const Overview = () => {
     return `${hours}h ${remainingMinutes}m`;
   };
   
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <Activity className="h-12 w-12 text-[#00FFD1] animate-pulse mx-auto mb-4" />
+          <p className="text-gray-400">Loading overview data...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAdmin && !adminStats) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-gray-400">Failed to load admin overview</p>
+          <Button onClick={fetchAdminOverview} className="mt-4">Retry</Button>
+        </div>
+      </div>
+    );
+  }
+  
   if (isAdmin) {
     // Admin Overview
     return (
@@ -150,7 +172,7 @@ const Overview = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total Revenue"
-            value={`$${adminStats.totalRevenue.toLocaleString()}`}
+            value={`$${adminStats.total_revenue.toLocaleString()}`}
             icon={DollarSign}
             trend="+12% from last month"
             trendUp={true}
@@ -158,7 +180,7 @@ const Overview = () => {
           
           <StatsCard
             title="Total Minutes Used"
-            value={adminStats.totalMinutes.toLocaleString()}
+            value={adminStats.total_minutes_used.toLocaleString()}
             icon={Clock}
             trend="+8% from last month"
             trendUp={true}
@@ -166,7 +188,7 @@ const Overview = () => {
           
           <StatsCard
             title="Total Users"
-            value={adminStats.totalUsers.toString()}
+            value={adminStats.total_users.toString()}
             icon={Users}
             trend="+3 new this month"
             trendUp={true}
@@ -174,9 +196,9 @@ const Overview = () => {
           
           <StatsCard
             title="Active Users"
-            value={adminStats.activeUsers.toString()}
+            value={adminStats.active_users.toString()}
             icon={Activity}
-            trend="67% active rate"
+            trend={`${Math.round((adminStats.active_users / adminStats.total_users) * 100)}% active rate`}
             trendUp={true}
           />
         </div>
