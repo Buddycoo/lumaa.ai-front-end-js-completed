@@ -120,7 +120,7 @@ class DatabaseManager:
     async def get_all_users(self, include_admins: bool = False) -> List[dict]:
         """Get all users (optionally include admins)"""
         query = {} if include_admins else {"role": {"$ne": UserRole.ADMIN}}
-        users = await self.users.find(query).to_list(length=None)
+        users = await self.users.find(query, {"_id": 0}).to_list(length=None)
         return [self._parse_from_mongo(user) for user in users]
 
     async def update_user(self, user_id: str, update_data: UserUpdateRequest) -> bool:
