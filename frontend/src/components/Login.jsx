@@ -44,6 +44,90 @@ const Login = () => {
     // For now, redirect to mock Google OAuth
     window.location.href = `${process.env.REACT_APP_BACKEND_URL}/api/auth/google`;
   };
+  
+  // Forgot Password Handlers
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setResetLoading(true);
+    
+    try {
+      const response = await axios.post('/api/auth/forgot-password', { email: forgotEmail });
+      if (response.data.code) {
+        // TODO: Remove this in production - code should be sent via email
+        toast.success(`Reset code: ${response.data.code} (check console)`);
+        console.log('Reset Code:', response.data.code);
+      } else {
+        toast.success('If the email exists, a verification code has been sent');
+      }
+      setForgotPasswordStep(2);
+    } catch (error) {
+      toast.error('Failed to send reset code');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+  
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+    setResetLoading(true);
+    
+    try {
+      await axios.post('/api/auth/verify-reset-code', {
+        email: forgotEmail,
+        code: resetCode
+      });
+      toast.success('Code verified! Set your new password');
+      setForgotPasswordStep(3);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Invalid or expired code');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+  
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmNewPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    
+    setResetLoading(true);
+    
+    try {
+      await axios.post('/api/auth/reset-password', {
+        email: forgotEmail,
+        code: resetCode,
+        new_password: newPassword
+      });
+      toast.success('Password reset successfully! Please login');
+      setShowForgotPassword(false);
+      setForgotPasswordStep(1);
+      setForgotEmail('');
+      setResetCode('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to reset password');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+  
+  const resetForgotPasswordModal = () => {
+    setShowForgotPassword(false);
+    setForgotPasswordStep(1);
+    setForgotEmail('');
+    setResetCode('');
+    setNewPassword('');
+    setConfirmNewPassword('');
+  };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
