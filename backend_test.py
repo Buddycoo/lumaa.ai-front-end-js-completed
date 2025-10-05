@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Authentication Testing Script
-Tests JWT-based authentication system for Lumaa AI backend
+Comprehensive Backend API Testing Script
+Tests production database architecture and 35+ API endpoints for Lumaa AI backend
 """
 
 import requests
@@ -10,6 +10,7 @@ import sys
 from datetime import datetime
 import jwt
 import os
+import io
 from pathlib import Path
 
 # Load environment variables to get backend URL
