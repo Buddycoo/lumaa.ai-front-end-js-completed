@@ -10,10 +10,11 @@ import { toast } from 'sonner';
 const BotSettings = () => {
   const [settings, setSettings] = useState({
     openingMessage: "Hello! I'm your AI assistant from Lumaa AI. How can I help you today?",
-    model: 'gpt-4.1',
+    prompt: "You are a professional AI assistant. Be helpful, courteous, and provide accurate information to assist customers effectively.",
+    // Read-only settings controlled by admin
+    model: 'GPT-4',
     temperature: 0.7,
-    responseLength: 150,
-    category: 'sales'
+    category: 'real_estate'
   });
   
   const [isLoading, setIsLoading] = useState(false);
