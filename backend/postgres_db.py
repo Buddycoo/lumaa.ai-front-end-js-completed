@@ -554,6 +554,13 @@ async def initialize_demo_data(db_manager: PostgreSQLManager):
             "monthly_plan_cost": 150.0
         }
         await db_manager.create_user(user_data)
+    elif not user.get("sip_endpoints"):
+        # Update existing user with missing fields
+        update_data = {
+            "sip_endpoints": "sip:user1@lumaa.ai,sip:user2@lumaa.ai",
+            "concurrency": 5
+        }
+        await db_manager.update_user(user["id"], update_data)
     
     # Initialize default bot settings for each category
     categories = ["real_estate", "hospitality", "sales", "healthcare", "automotive"]
