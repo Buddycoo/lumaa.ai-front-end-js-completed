@@ -104,13 +104,18 @@ const AdminUserManagement = () => {
   };
 
   const handleUserStatusToggle = async (userId, currentStatus) => {
-    try {
-      const action = currentStatus === 'active' ? 'pause' : 'resume';
-      await axios.post(`/admin/users/${userId}/${action}`);
-      toast.success(`User ${action}d successfully`);
-      fetchUsers();
-    } catch (error) {
-      toast.error(`Failed to ${action} user`);
+    if (currentStatus === 'active') {
+      // For now, show alert - pause modal would go here
+      toast.error('Please use the new UserManagement component for pause functionality');
+    } else {
+      // Resume user directly
+      try {
+        await axios.post(`/admin/users/${userId}/resume`);
+        toast.success('User resumed successfully');
+        fetchUsers();
+      } catch (error) {
+        toast.error('Failed to resume user');
+      }
     }
   };
 
