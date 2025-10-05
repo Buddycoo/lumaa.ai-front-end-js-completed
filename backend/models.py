@@ -180,6 +180,16 @@ class CreditTopupRequest(BaseModel):
     payment_method: str = "card"  # card, bank_transfer, etc.
 
 
+class UserPauseRequest(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
+    admin_pin: str = Field(min_length=4, max_length=4)
+
+class GlobalPauseRequest(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
+    admin_pin: str = Field(min_length=4, max_length=4)
+
+
+
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
