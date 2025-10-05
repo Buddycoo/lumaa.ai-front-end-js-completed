@@ -106,7 +106,23 @@ async def get_all_users(
     admin_user: dict = Depends(get_admin_user),
     pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
 ):
+    from datetime import datetime, timezone
+    
     users = await pg_db_manager.get_all_users(include_admins=False)
+    
+    # Add days_until_billing calculation for each user
+    for user in users:
+        next_billing = user.get("next_billing_date")
+        if next_billing:
+            if isinstance(next_billing, str):
+                next_billing = datetime.fromisoformat(next_billing.replace('Z', '+00:00'))
+            elif hasattr(next_billing, 'replace') and next_billing.tzinfo is None:
+                next_billing = next_billing.replace(tzinfo=timezone.utc)
+            
+            user["days_until_billing"] = max(0, (next_billing - datetime.now(timezone.utc)).days)
+        else:
+            user["days_until_billing"] = 0
+    
     return [AdminUserResponse(**user) for user in users]
 
 @router.post("/admin/users", response_model=dict)
