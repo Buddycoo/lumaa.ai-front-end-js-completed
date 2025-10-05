@@ -280,7 +280,7 @@ class DatabaseManager:
 
     async def get_user_bot_settings(self, user_id: str) -> Optional[dict]:
         """Get user-specific bot settings"""
-        settings = await self.user_bot_settings.find_one({"user_id": user_id})
+        settings = await self.user_bot_settings.find_one({"user_id": user_id}, {"_id": 0})
         if settings:
             return self._parse_from_mongo(settings)
         return None
