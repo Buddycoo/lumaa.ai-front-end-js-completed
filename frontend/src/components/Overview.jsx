@@ -255,18 +255,18 @@ const Overview = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-300 mb-1">
-                Status: <span className={stats.botActive ? 'text-green-400' : 'text-red-400'}>
-                  {stats.botActive ? 'Active' : 'Inactive'}
+                Status: <span className={userStats.botStatus === 'active' ? 'text-green-400' : 'text-red-400'}>
+                  {userStats.botStatus === 'active' ? 'Active' : 'Inactive'}
                 </span>
               </p>
               <p className="text-sm text-gray-500">
-                Your AI bot is {stats.botActive ? 'ready to make calls' : 'currently paused'}
+                Your AI bot is {userStats.botStatus === 'active' ? 'ready to make calls' : 'currently paused'}
               </p>
             </div>
             <Button 
-              className={stats.botActive ? 'bg-red-600 hover:bg-red-700' : 'bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90'}
+              className={userStats.botStatus === 'active' ? 'bg-red-600 hover:bg-red-700' : 'bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90'}
             >
-              {stats.botActive ? 'Pause Bot' : 'Activate Bot'}
+              {userStats.botStatus === 'active' ? 'Pause Bot' : 'Activate Bot'}
             </Button>
           </div>
         </CardContent>
