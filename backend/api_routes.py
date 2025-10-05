@@ -335,4 +335,166 @@ async def upload_leads_csv(
 # System status
 @router.get("/system/status")
 async def get_system_status():
+
+    return {"status": "operational", "database": "PostgreSQL"}
+
+# Password Management Endpoints
+@router.post("/auth/change-password", response_model=dict)
+async def change_password(
+    request: PasswordChangeRequest,
+    current_user: dict = Depends(get_current_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    success = await pg_db_manager.change_password(
+        current_user["id"],
+        request.current_password,
+        request.new_password
+    )
+    if not success:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    return {"message": "Password changed successfully"}
+
+@router.post("/auth/forgot-password", response_model=dict)
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    reset_code = await pg_db_manager.initiate_password_reset(request.email)
+    if not reset_code:
+        # Don't reveal if email exists for security
+        return {"message": "If the email exists, a verification code has been sent"}
+    
+    # TODO: Send email with reset_code (will implement email service later)
+    # For now, return code in response (REMOVE IN PRODUCTION)
+    return {
+        "message": "Verification code generated",
+        "code": reset_code  # TODO: Remove this and send via email
+    }
+
+@router.post("/auth/verify-reset-code", response_model=dict)
+async def verify_reset_code(
+    request: VerifyResetCodeRequest,
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    is_valid = await pg_db_manager.verify_reset_code(request.email, request.code)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code")
+    return {"message": "Code verified successfully"}
+
+@router.post("/auth/reset-password", response_model=dict)
+async def reset_password(
+    request: ResetPasswordRequest,
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    success = await pg_db_manager.reset_password(
+        request.email,
+        request.code,
+        request.new_password
+    )
+    if not success:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code")
+    return {"message": "Password reset successfully"}
+
+# Notification Endpoints
+@router.get("/notifications", response_model=List[NotificationResponse])
+async def get_notifications(
+    unread_only: bool = False,
+    current_user: dict = Depends(get_current_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    if current_user.get("role") == "admin":
+        notifications = await pg_db_manager.get_admin_notifications(unread_only)
+    else:
+        notifications = await pg_db_manager.get_user_notifications(current_user["id"], unread_only)
+    return [NotificationResponse(**notif) for notif in notifications]
+
+@router.get("/notifications/unread-count", response_model=dict)
+async def get_unread_count(
+    current_user: dict = Depends(get_current_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    user_id = None if current_user.get("role") == "admin" else current_user["id"]
+    count = await pg_db_manager.get_unread_count(user_id)
+    return {"count": count}
+
+@router.post("/notifications/{notification_id}/read", response_model=dict)
+async def mark_notification_read(
+    notification_id: str,
+    current_user: dict = Depends(get_current_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    success = await pg_db_manager.mark_notification_read(notification_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"message": "Notification marked as read"}
+
+# Contact Form Endpoint
+@router.post("/contact", response_model=dict)
+async def submit_contact_form(
+    form_data: ContactFormSubmission,
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    # Create admin notification
+    notification_data = {
+        "type": "contact_form",
+        "title": f"New Contact Form from {form_data.name}",
+        "message": form_data.message,
+        "contact_name": form_data.name,
+        "contact_email": form_data.email,
+        "contact_phone": form_data.phone,
+        "contact_company": form_data.company
+    }
+    
+    notification_id = await pg_db_manager.create_notification(notification_data)
+    
+    # TODO: Send email notification to admin (will implement email service later)
+    
+    return {
+        "message": "Thank you for contacting us! We'll get back to you soon.",
+        "notification_id": notification_id
+    }
+
+# Admin Update/Broadcast Endpoint
+@router.post("/admin/send-update", response_model=dict)
+async def send_admin_update(
+    update_request: AdminUpdateRequest,
+    admin_user: dict = Depends(get_admin_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    # Get recipient users based on type
+    if update_request.recipient_type == "all":
+        users = await pg_db_manager.get_all_users(include_admins=False)
+    elif update_request.recipient_type == "category" and update_request.category:
+        all_users = await pg_db_manager.get_all_users(include_admins=False)
+        users = [u for u in all_users if u.get("category") == update_request.category]
+    elif update_request.recipient_type == "individual" and update_request.recipient_ids:
+        users = []
+        for user_id in update_request.recipient_ids:
+            user = await pg_db_manager.get_user_by_id(user_id)
+            if user:
+                users.append(user)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid recipient configuration")
+    
+    # Create in-app notifications
+    notification_ids = []
+    if update_request.send_notification:
+        for user in users:
+            notification_data = {
+                "user_id": user["id"],
+                "type": "admin_update",
+                "title": update_request.subject,
+                "message": update_request.message
+            }
+            notif_id = await pg_db_manager.create_notification(notification_data)
+            notification_ids.append(notif_id)
+    
+    # TODO: Send emails (will implement email service later)
+    
+    return {
+        "message": f"Update sent to {len(users)} user(s)",
+        "users_count": len(users),
+        "notification_ids": notification_ids
+    }
+
     return {"status": "operational", "database": "PostgreSQL"}
