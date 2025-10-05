@@ -224,6 +224,114 @@ frontend:
         -working: true
         -agent: "testing"
         -comment: "✅ PASSED: Dashboard loads correctly after successful login. Role-based access control working - admin users see 'Admin Dashboard' with User Control menu, regular users see 'Your Dashboard' without admin features. Protected routes correctly redirect to login when not authenticated. Dashboard layout with sidebar, header, and main content area all functional. Navigation between dashboard sections working."
+        -working: true
+        -agent: "testing"
+        -comment: "✅ COMPREHENSIVE DASHBOARD TESTING COMPLETED: Fixed critical DashboardLayout error (missing Shield import). Admin Dashboard: ✅ Revenue metrics visible ✅ Global pause functionality ✅ User management with Add User ✅ Bot settings for all categories ✅ Correct navigation. User Dashboard: ✅ NO revenue data shown ✅ User stats (calls/pickup rate/minutes/category) ✅ PIN protection for bot control ✅ Read-only model/temperature, editable prompt/opening message ✅ CSV upload hidden for Real Estate users ✅ Call logs exclude revenue ✅ Settings show minutes, hide revenue. All refined requirements successfully verified."
+
+  - task: "Admin Dashboard Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/AdminOverview.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing admin overview with revenue metrics, user management, global pause, and bot settings"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: Admin can see Total Revenue ($0), Total Minutes Used (0), Total Users (2), Active Users (2). Global pause functionality visible with 'Pause All' button. User Management section shows user table with revenue column. Add User button functional. Universal Bot Settings section shows category buttons (Real Estate, Hospitality, Sales, Healthcare, Automotive). Admin navigation includes Overview, User Management, Settings. All admin-specific features working correctly."
+
+  - task: "User Dashboard Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserOverview.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing user overview without revenue, call logs with lead details only, bot settings restrictions, PIN protection"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: User correctly does NOT see revenue data anywhere. Shows Calls Made (0), Pickup Rate (0%), Minutes Used (0 of 1000 allocated), Category (Real Estate). Bot Control section with PIN protection working. Recent Call Logs section shows 'No call logs yet'. User navigation includes Overview, Call Logs, Bot Settings, Settings (NO Upload Leads for Real Estate category). All user restrictions correctly implemented."
+
+  - task: "Bot Settings Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserBotSettings.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing user bot settings with read-only model/temperature and editable prompt/opening message"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: Current Configuration section shows Model (GPT-4) and Temperature (0.7) as read-only, managed by admin. Opening Message and System Prompt sections are editable with character limits (500/2000). Save Settings button available. Tips section provides guidance. User can only edit prompt and opening message as required."
+
+  - task: "Call Logs Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserCallLogs.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing call logs show lead details only, no revenue or niche data"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: Call logs table headers show ['Lead', 'Outcome', 'Duration', 'Date', 'Actions'] - NO revenue columns. Stats show Total Calls, Total Duration, Success Rate. Filters available for search and outcome. Lead details include name, phone, outcome, duration, date. No revenue or niche data displayed as required."
+
+  - task: "Settings Page Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Settings.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing account info shows category/role/status/minutes for users, password/PIN change functionality"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: Account Information shows Name, Email, Role (user), Category (Real Estate), Minutes Used (0/1000), Status (ACTIVE) - NO revenue for users. Change Password section with current/new/confirm fields and show/hide toggles. Change PIN section with validation (4-6 digits, numbers only). Security Notes section with helpful tips. All user account management features working correctly."
+
+  - task: "PIN Protection Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserOverview.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing PIN verification required for bot pause/resume operations"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: PIN modal opens when clicking Pause Bot button. Modal shows 'PIN Verification Required' title with Shield icon. PIN input field with password type. Confirm/Cancel buttons available. PIN validation working (401 errors for invalid PINs indicate backend validation). PIN protection successfully implemented for sensitive operations."
+
+  - task: "Category Restrictions Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/UserLeads.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        -working: "NA"
+        -agent: "testing"
+        -comment: "Testing CSV upload only available for sales users, Real Estate users should not see upload functionality"
+        -working: true
+        -agent: "testing"
+        -comment: "✅ PASSED: Real Estate user (user@lumaa.ai) correctly does NOT see 'Upload Leads' in navigation menu. CSV upload functionality properly restricted to sales category only. User navigation shows Overview, Call Logs, Bot Settings, Settings - NO Upload Leads option. Category-based restrictions working correctly as per refined requirements."
 
   - task: "Authentication Error Handling"
     implemented: true
