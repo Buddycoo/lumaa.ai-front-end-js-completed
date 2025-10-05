@@ -11,6 +11,9 @@ from typing import List
 import uuid
 from datetime import datetime
 from auth import UserLogin, TokenResponse, RefreshTokenRequest, authenticate_user, generate_tokens, verify_token, UserResponse
+from database import DatabaseManager, initialize_demo_data
+from api_routes import router as api_routes
+from models import *
 
 
 ROOT_DIR = Path(__file__).parent
