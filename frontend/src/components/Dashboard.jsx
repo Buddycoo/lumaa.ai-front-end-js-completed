@@ -34,6 +34,7 @@ const Dashboard = () => {
             <Route path="/" element={<Overview />} />
             <Route path="/calls" element={<CallLogs />} />
             <Route path="/settings" element={<BotSettings />} />
+            <Route path="/billing" element={<UserPayments />} />
           </>
         )}
       </Routes>
