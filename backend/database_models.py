@@ -171,10 +171,10 @@ class Payment(Base):
     user = relationship("User", back_populates="payments")
 
 class Transaction(Base):
-    __tablename__ = "transactions"
+    __tablename__ = "lumaa_transactions"
     
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey('users.id'), nullable=False)
+    user_id = Column(String, ForeignKey('lumaa_users.id'), nullable=False)
     amount = Column(Float, nullable=False)
     transaction_type = Column(Enum(TransactionType), nullable=False)
     description = Column(String(500), nullable=False)
