@@ -16,20 +16,53 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
-  // Actions
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  refreshAuth: () => Promise<void>;
-  setTokens: (accessToken: string, refreshToken: string) => void;
   clearError: () => void;
-  setUser: (user: User) => void;
+  refreshAccessToken: () => Promise<void>;
 }
 
-const API_URL = process.env.REACT_APP_API_URL;
+// Configure axios defaults
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
-export const useAuthStore = create<AuthState>()(
-  persist(
+// Add request interceptor to include auth token
+axios.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Add response interceptor to handle token refresh
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        await useAuthStore.getState().refreshAccessToken();
+        const newToken = useAuthStore.getState().accessToken;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return axios(originalRequest);
+      } catch (refreshError) {
+        useAuthStore.getState().logout();
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+export const useAuthStore = create<AuthState>()(n  persist(
     (set, get) => ({
       user: null,
       accessToken: null,
@@ -37,20 +70,17 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
-
+      
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         
         try {
-          const response = await axios.post(`${API_URL}/auth/login`, {
+          const response = await axios.post('/auth/login', {
             email,
             password
           });
-
-          const { user, accessToken, refreshToken } = response.data;
           
-          // Configure axios default headers
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          const { user, accessToken, refreshToken } = response.data;
           
           set({
             user,
@@ -70,11 +100,8 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-
+      
       logout: () => {
-        // Clear axios headers
-        delete axios.defaults.headers.common['Authorization'];
-        
         set({
           user: null,
           accessToken: null,
@@ -83,52 +110,43 @@ export const useAuthStore = create<AuthState>()(
           error: null
         });
       },
-
-      refreshAuth: async () => {
+      
+      clearError: () => {
+        set({ error: null });
+      },
+      
+      refreshAccessToken: async () => {
         const { refreshToken } = get();
         
         if (!refreshToken) {
-          get().logout();
-          return;
+          throw new Error('No refresh token available');
         }
-
+        
         try {
-          const response = await axios.post(`${API_URL}/auth/refresh`, {
+          const response = await axios.post('/auth/refresh', {
             refreshToken
           });
-
-          const { user, accessToken, refreshToken: newRefreshToken } = response.data;
           
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          const { user, accessToken: newAccessToken } = response.data;
           
           set({
             user,
-            accessToken,
-            refreshToken: newRefreshToken,
-            isAuthenticated: true,
-            error: null
+            accessToken: newAccessToken,
+            isAuthenticated: true
           });
         } catch (error) {
-          get().logout();
+          set({
+            user: null,
+            accessToken: null,
+            refreshToken: null,
+            isAuthenticated: false
+          });
           throw error;
         }
-      },
-
-      setTokens: (accessToken: string, refreshToken: string) => {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        set({ accessToken, refreshToken });
-      },
-
-      setUser: (user: User) => {
-        set({ user, isAuthenticated: true });
-      },
-
-      clearError: () => {
-        set({ error: null });
       }
     }),
     {
-      name: 'lumaa-auth-store',
+      name: 'lumaa-auth',
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
@@ -137,40 +155,4 @@ export const useAuthStore = create<AuthState>()(
       })
     }
   )
-);
-
-// Setup axios interceptors
-axios.interceptors.request.use(
-  (config) => {
-    const { accessToken } = useAuthStore.getState();
-    if (accessToken && config.headers) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      try {
-        await useAuthStore.getState().refreshAuth();
-        return axios(originalRequest);
-      } catch (refreshError) {
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-    
-    return Promise.reject(error);
-  }
 );
