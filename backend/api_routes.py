@@ -404,3 +404,96 @@ async def get_system_status(
         "is_global_paused": system_settings.get("is_global_paused", False),
         "user_status": current_user.get("status", UserStatus.ACTIVE)
     }
+
+# Payment & Billing Endpoints
+
+@router.post("/user/topup-credits")
+async def topup_credits(
+    request: CreditTopupRequest,
+    current_user: dict = Depends(get_current_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    # Create payment record
+    payment_id = await db_manager.create_payment(
+        user_id=current_user["id"],
+        amount=request.amount,
+        transaction_type=TransactionType.TOPUP,
+        description=f"Credit top-up of {request.amount} AED"
+    )
+    
+    # For demo purposes, simulate immediate payment success
+    success = await db_manager.process_payment(payment_id, "demo_payment_ref")
+    
+    if success:
+        return {"message": f"Successfully added {request.amount} AED to your account", "payment_id": payment_id}
+    else:
+        raise HTTPException(status_code=400, detail="Payment processing failed")
+
+@router.get("/user/payment-history")
+async def get_payment_history(
+    current_user: dict = Depends(get_current_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    payments = await db_manager.get_user_payments(current_user["id"])
+    return payments
+
+@router.get("/user/transactions")
+async def get_transaction_history(
+    current_user: dict = Depends(get_current_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    transactions = await db_manager.get_user_transactions(current_user["id"])
+    return transactions
+
+# Admin Payment Management
+@router.post("/admin/send-payment-link")
+async def send_payment_link(
+    request: PaymentLinkRequest,
+    admin_user: dict = Depends(get_admin_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    # Create payment record with link
+    payment_id = await db_manager.create_payment_link(
+        user_id=request.user_id,
+        amount=request.amount,
+        description=request.description
+    )
+    
+    # In production, would send email/SMS with payment link
+    payment_link = f"https://lumaa.ai/pay/{payment_id}"
+    
+    return {
+        "message": "Payment link created successfully",
+        "payment_id": payment_id,
+        "payment_link": payment_link
+    }
+
+@router.get("/admin/payments")
+async def get_all_payments(
+    admin_user: dict = Depends(get_admin_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    payments = await db_manager.get_all_payments()
+    return payments
+
+@router.put("/admin/users/{user_id}/edit")
+async def edit_user(
+    user_id: str,
+    request: EditUserRequest,
+    admin_user: dict = Depends(get_admin_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    success = await db_manager.edit_user(user_id, request)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated successfully"}
+
+@router.get("/admin/users-due-payment")
+async def get_users_due_payment(
+    admin_user: dict = Depends(get_admin_user),
+    db_manager: DatabaseManager = Depends(get_db_manager)
+):
+    # Get users with payments due in next 3 days
+    users_due = await db_manager.get_users_payment_due(days=3)
+    return users_due
