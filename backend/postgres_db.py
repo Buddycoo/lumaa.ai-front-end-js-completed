@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError
-from database_models import Base, User, Lead, CallLog, BotSettings, Payment, Transaction, SystemSettings
-from database_models import UserRole, UserCategory, UserStatus, PaymentStatus, TransactionType, CallOutcome, BotModel
+from database_models import Base, User, Lead, CallLog, BotSettings, Payment, Transaction, SystemSettings, Notification
+from database_models import UserRole, UserCategory, UserStatus, PaymentStatus, TransactionType, CallOutcome, BotModel, NotificationType
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict, Any
 import bcrypt
+import random
 import os
 
 class PostgreSQLManager:
