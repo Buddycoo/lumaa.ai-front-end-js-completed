@@ -22,46 +22,24 @@ async function main() {
   });
   console.log('✅ Created Admin:', superAdmin.email);
 
-  // Create Test Users
-  const users = [
-    {
-      name: 'Ahmed Hassan',
-      email: 'ahmed@emirates.ae',
-      role: 'USER' as Role,
+  // Create Regular User  
+  const userPassword = await bcrypt.hash('pass', 12);
+  const regularUser = await prisma.user.upsert({
+    where: { email: 'user@lumaa.ai' },
+    update: {},
+    create: {
+      name: 'User Dashboard',
+      email: 'user@lumaa.ai',
+      password: userPassword,
+      role: 'USER',
       minutesLeft: 1000,
-      minutesUsed: 234.5
-    },
-    {
-      name: 'Sarah Al-Mansouri',
-      email: 'sarah@techinnovations.ae',
-      role: 'USER' as Role,
-      minutesLeft: 750,
-      minutesUsed: 156.2
-    },
-    {
-      name: 'Maria Rodriguez',
-      email: 'maria@luxuryhotels.ae',
-      role: 'USER' as Role,
-      minutesLeft: 2000,
-      minutesUsed: 89.7
+      minutesUsed: 234.5,
+      isActive: true
     }
-  ];
+  });
+  console.log('✅ Created User:', regularUser.email);
 
-  const createdUsers = [];
-  for (const userData of users) {
-    const userPassword = await bcrypt.hash('user123', 12);
-    const user = await prisma.user.upsert({
-      where: { email: userData.email },
-      update: {},
-      create: {
-        ...userData,
-        password: userPassword,
-        isActive: true
-      }
-    });
-    createdUsers.push(user);
-    console.log('✅ Created User:', user.email);
-  }
+  const createdUsers = [regularUser];
 
   // Create Bot Settings for all users
   for (const user of [superAdmin, admin, ...createdUsers]) {
