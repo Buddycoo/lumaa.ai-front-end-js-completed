@@ -59,9 +59,14 @@ const Settings = () => {
 
     setChangingPassword(true);
     try {
-      await axios.post('/user/change-password', {
+      const token = localStorage.getItem('token');
+      await axios.post('/api/auth/change-password', {
         current_password: passwordForm.current_password,
         new_password: passwordForm.new_password
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       toast.success('Password changed successfully');
