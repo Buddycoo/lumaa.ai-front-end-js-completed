@@ -57,16 +57,22 @@ async function main() {
   }
   console.log('✅ Created Bot Settings for all users');
 
-  // Create System Status
+  // Create System Status - check if exists first
   const systemServices = ['ai', 'calls', 'whatsapp'];
   for (const service of systemServices) {
-    await prisma.systemStatus.create({
-      data: {
-        serviceName: service,
-        isEnabled: true,
-        updatedBy: superAdmin.id
-      }
+    const existing = await prisma.systemStatus.findUnique({
+      where: { serviceName: service }
     });
+    
+    if (!existing) {
+      await prisma.systemStatus.create({
+        data: {
+          serviceName: service,
+          isEnabled: true,
+          updatedBy: superAdmin.id
+        }
+      });
+    }
   }
   console.log('✅ Created System Status entries');
 
