@@ -221,6 +221,12 @@ class UserDashboardResponse(BaseModel):
     status: UserStatus
     minutes_used: int
     minutes_allocated: int
+    # Payment info for users
+    credits_balance: float
+    monthly_plan_cost: float
+    next_billing_date: datetime
+    payment_status: PaymentStatus
+    days_until_billing: int
     # No revenue_generated - users don't see revenue
     created_at: datetime
 
