@@ -15,45 +15,88 @@ const UserManagement = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
   
-  // Mock user data
-  const users = [
-    { 
-      id: 1,
-      name: 'Ahmed Hassan', 
-      email: 'ahmed@emirates.ae', 
-      role: 'USER', 
-      status: 'Active', 
-      minutesUsed: 234.5, 
-      minutesLeft: 765.5,
-      lastActive: '2 hours ago'
-    },
-    { 
-      id: 2,
-      name: 'Sarah Al-Mansouri', 
-      email: 'sarah@techinnovations.ae', 
-      role: 'USER', 
-      status: 'Active', 
-      minutesUsed: 156.2, 
-      minutesLeft: 843.8,
-      lastActive: '1 day ago'
-    },
-    { 
-      id: 3,
-      name: 'Admin Manager', 
-      email: 'manager@lumaa.ai', 
-      role: 'ADMIN', 
-      status: 'Active', 
-      minutesUsed: 0, 
-      minutesLeft: 5000,
-      lastActive: '5 minutes ago'
-    },
-    { 
-      id: 4,
-      name: 'Maria Rodriguez', 
-      email: 'maria@luxuryhotels.ae', 
-      role: 'USER', 
-      status: 'Paused', 
-      minutesUsed: 89.7, 
+  // State management
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [addUserModal, setAddUserModal] = useState(false);
+  const [editUserModal, setEditUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  
+  // New user form state
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    category: '',
+    pin_code: '',
+    minutes_allocated: 1000
+  });
+
+  const categories = [
+    { value: 'real_estate', label: 'Real Estate' },
+    { value: 'hospitality', label: 'Hospitality' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'healthcare', label: 'Healthcare' },
+    { value: 'automotive', label: 'Automotive' }
+  ];
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchUsers();
+    }
+  }, [isAdmin]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/admin/users');
+      setUsers(response.data);
+    } catch (error) {
+      toast.error('Failed to load users');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/admin/users', {
+        ...newUser,
+        password: 'pass' // Default password for demo
+      });
+      
+      toast.success('User created successfully');
+      setAddUserModal(false);
+      setNewUser({
+        name: '',
+        email: '',
+        category: '',
+        pin_code: '',
+        minutes_allocated: 1000
+      });
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create user');
+    }
+  };
+
+  const handleToggleUserStatus = async (userId, currentStatus) => {
+    try {
+      const action = currentStatus === 'active' ? 'pause' : 'resume';
+      await axios.post(`/admin/users/${userId}/${action}`);
+      
+      toast.success(`User ${action}d successfully`);
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      toast.error(`Failed to ${action} user`);
+    }
+  };
+
+  const filteredUsers = users.filter(u => 
+    u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.email.toLowerCase().includes(searchTerm.toLowerCase())
+  ); 
       minutesLeft: 1910.3,
       lastActive: '3 days ago'
     }
