@@ -127,7 +127,7 @@ def generate_tokens(user: dict):
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(data={"sub": user["email"]})
-    
+    return access_token, refresh_token
 
 
 async def authenticate_user_pg(pg_db_manager, email: str, password: str):
