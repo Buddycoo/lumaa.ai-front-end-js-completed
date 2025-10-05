@@ -98,10 +98,8 @@ async function main() {
   // Create System Status
   const systemServices = ['ai', 'calls', 'whatsapp'];
   for (const service of systemServices) {
-    await prisma.systemStatus.upsert({
-      where: { serviceName: service },
-      update: {},
-      create: {
+    await prisma.systemStatus.create({
+      data: {
         serviceName: service,
         isEnabled: true,
         updatedBy: superAdmin.id
