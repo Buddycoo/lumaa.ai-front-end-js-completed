@@ -178,10 +178,13 @@ const DashboardLayout = ({ children }) => {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+            <NotificationBell />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400 hover:text-white"
+              onClick={() => navigate('/dashboard/settings')}
+            >
               <User className="h-4 w-4" />
             </Button>
           </div>
