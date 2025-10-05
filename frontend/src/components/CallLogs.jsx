@@ -4,50 +4,46 @@ import { Button } from './ui/button';
 import { Phone, Clock, DollarSign, Eye } from 'lucide-react';
 
 const CallLogs = () => {
-  // Mock call log data
+  // Mock call log data - LEAD DETAILS ONLY (no revenue/niche)
   const callLogs = [
     {
       id: 1,
-      number: '+971-50-123-4567',
-      project: 'Real Estate Lead - Project Alpha',
+      leadName: 'Ahmed Al-Mansouri',
+      leadPhone: '+971-50-123-4567',
+      callOutcome: 'Interested',
       duration: '2:34',
-      cost: 2.50,
-      status: 'SUCCESS',
       timestamp: '2024-01-05 14:30'
     },
     {
       id: 2,
-      number: '+971-50-234-5678',
-      project: 'Hotel Booking - Luxury Suite',
+      leadName: 'Sarah Johnson',
+      leadPhone: '+971-50-234-5678',
+      callOutcome: 'Callback Requested',
       duration: '3:12',
-      cost: 2.80,
-      status: 'SUCCESS',
       timestamp: '2024-01-05 13:45'
     },
     {
       id: 3,
-      number: '+971-50-345-6789',
-      project: 'Tech Support - Software Issue',
+      leadName: 'Mohammad Hassan',
+      leadPhone: '+971-50-345-6789',
+      callOutcome: 'Not Interested',
       duration: '1:45',
-      cost: 1.75,
-      status: 'FAILED',
       timestamp: '2024-01-05 12:20'
     },
     {
       id: 4,
-      number: '+971-50-456-7890',
-      project: 'Sales Outreach - Enterprise',
+      leadName: 'Emily Rodriguez',
+      leadPhone: '+971-50-456-7890',
+      callOutcome: 'Voicemail',
       duration: '4:22',
-      cost: 3.20,
-      status: 'SUCCESS',
       timestamp: '2024-01-05 11:15'
     },
     {
       id: 5,
-      number: '+971-50-567-8901',
-      project: 'Customer Support - Account Help',
+      leadName: 'David Kim',
+      leadPhone: '+971-50-567-8901',
+      callOutcome: 'No Answer',
       duration: '0:45',
-      cost: 0.75,
       status: 'BUSY',
       timestamp: '2024-01-05 10:30'
     }
