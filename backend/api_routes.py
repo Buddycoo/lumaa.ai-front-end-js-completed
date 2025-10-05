@@ -70,6 +70,10 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         if isinstance(next_billing, str):
             from datetime import datetime
             next_billing = datetime.fromisoformat(next_billing.replace('Z', '+00:00'))
+        elif hasattr(next_billing, 'replace') and next_billing.tzinfo is None:
+            # Make naive datetime timezone-aware
+            next_billing = next_billing.replace(tzinfo=timezone.utc)
+        
         days_until_billing = max(0, (next_billing - datetime.now(timezone.utc)).days)
     else:
         days_until_billing = 0
