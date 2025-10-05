@@ -175,6 +175,23 @@ class AdminBotSettingsUpdateRequest(BaseModel):
     opening_message: Optional[str] = Field(None, max_length=500)
     prompt: Optional[str] = Field(None, max_length=2000)
 
+class CreditTopupRequest(BaseModel):
+    amount: float = Field(gt=0, description="Amount in AED to add as credits")
+    payment_method: str = "card"  # card, bank_transfer, etc.
+
+class PaymentLinkRequest(BaseModel):
+    user_id: str
+    amount: float
+    description: str = "Monthly subscription payment"
+
+class EditUserRequest(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    category: Optional[UserCategory] = None
+    minutes_allocated: Optional[int] = None
+    monthly_plan_cost: Optional[float] = None
+    status: Optional[UserStatus] = None
+
 class CSVUploadResponse(BaseModel):
     success: bool
     message: str
