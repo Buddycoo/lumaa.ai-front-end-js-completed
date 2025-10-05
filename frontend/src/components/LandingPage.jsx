@@ -610,16 +610,16 @@ const LandingPage = () => {
               
               <div className="pt-6 border-t border-border-subtle">
                 <h4 className="heading-3 mb-4 text-brand-primary">Existing Client?</h4>
-                <a 
-                  href="http://localhost:3001/login" 
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button 
+                  onClick={() => {
+                    trackButtonClick('Access Dashboard', 'Contact Section');
+                    window.location.href = '/login';
+                  }}
                   className="btn-primary w-full inline-flex items-center justify-center"
-                  onClick={() => trackButtonClick('Access Dashboard', 'Contact Section')}
                 >
                   Access Dashboard
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </a>
+                </button>
                 <p className="text-sm text-text-muted mt-2 text-center">
                   Login to manage your AI calling campaigns
                 </p>
