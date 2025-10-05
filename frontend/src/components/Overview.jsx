@@ -49,7 +49,7 @@ const Overview = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/admin/overview', {
+      const response = await axios.get('/admin/overview', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAdminStats(response.data);
