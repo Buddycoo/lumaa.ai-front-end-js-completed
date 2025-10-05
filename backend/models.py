@@ -250,6 +250,7 @@ class UserResponse(BaseModel):
     role: UserRole
     category: UserCategory
     status: UserStatus
+    pause_reason: Optional[str] = None
     minutes_used: int
     minutes_allocated: int
     revenue_generated: float
