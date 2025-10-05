@@ -613,7 +613,7 @@ class PostgreSQLAPITester:
                 'file': ('test_leads.csv', io.StringIO(csv_content), 'text/csv')
             }
             
-            response = self.session.post(f"{self.api_url}/user/upload-leads", 
+            response = self.session.post(f"{self.api_url}/user/leads/upload-csv", 
                                        files=files, headers=headers, timeout=10)
             
             if response.status_code == 200:
@@ -653,7 +653,7 @@ class PostgreSQLAPITester:
                 'file': ('test_leads.csv', io.StringIO(csv_content), 'text/csv')
             }
             
-            response = self.session.post(f"{self.api_url}/user/upload-leads", 
+            response = self.session.post(f"{self.api_url}/user/leads/upload-csv", 
                                        files=files, headers=headers, timeout=10)
             
             if response.status_code == 403:
