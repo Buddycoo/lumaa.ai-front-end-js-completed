@@ -145,7 +145,7 @@ class PostgreSQLAPITester:
                 user = data['user']
                 if (user.get('email') == 'user@lumaa.ai' and 
                     user.get('role') == 'user' and 
-                    user.get('name') == 'Regular User'):
+                    user.get('name') == 'Demo User'):
                     
                     self.log_test("User Login", True, 
                                 "User login successful with correct user data",
