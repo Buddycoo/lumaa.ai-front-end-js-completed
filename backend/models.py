@@ -179,6 +179,51 @@ class CreditTopupRequest(BaseModel):
     amount: float = Field(gt=0, description="Amount in AED to add as credits")
     payment_method: str = "card"  # card, bank_transfer, etc.
 
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class VerifyResetCodeRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)
+    new_password: str = Field(min_length=8)
+
+class NotificationResponse(BaseModel):
+    id: str
+    user_id: Optional[str]
+    type: str
+    title: str
+    message: str
+    data: Optional[str]
+    is_read: bool
+    contact_name: Optional[str]
+    contact_email: Optional[str]
+    contact_phone: Optional[str]
+    contact_company: Optional[str]
+    created_at: datetime
+
+class ContactFormSubmission(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str]
+    company: Optional[str]
+    message: str
+
+class AdminUpdateRequest(BaseModel):
+    subject: str
+    message: str
+    recipient_type: str = "all"  # all, category, individual
+    recipient_ids: Optional[List[str]] = None
+    category: Optional[str] = None
+    send_email: bool = True
+    send_notification: bool = True
+    scheduled_time: Optional[datetime] = None
+
+
 class PaymentLinkRequest(BaseModel):
     user_id: str
     amount: float
