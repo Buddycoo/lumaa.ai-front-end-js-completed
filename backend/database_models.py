@@ -140,7 +140,7 @@ class CallLog(Base):
     lead = relationship("Lead", back_populates="call_logs")
 
 class BotSettings(Base):
-    __tablename__ = "bot_settings"
+    __tablename__ = "lumaa_bot_settings"
     
     id = Column(String, primary_key=True, default=generate_uuid)
     category = Column(Enum(UserCategory), unique=True, nullable=False)
