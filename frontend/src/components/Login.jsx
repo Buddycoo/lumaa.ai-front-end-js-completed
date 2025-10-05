@@ -51,7 +51,7 @@ const Login = () => {
     setResetLoading(true);
     
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email: forgotEmail });
+      const response = await axios.post('/auth/forgot-password', { email: forgotEmail });
       if (response.data.code) {
         // TODO: Remove this in production - code should be sent via email
         toast.success(`Reset code: ${response.data.code} (check console)`);
@@ -72,7 +72,7 @@ const Login = () => {
     setResetLoading(true);
     
     try {
-      await axios.post('/api/auth/verify-reset-code', {
+      await axios.post('/auth/verify-reset-code', {
         email: forgotEmail,
         code: resetCode
       });
@@ -101,7 +101,7 @@ const Login = () => {
     setResetLoading(true);
     
     try {
-      await axios.post('/api/auth/reset-password', {
+      await axios.post('/auth/reset-password', {
         email: forgotEmail,
         code: resetCode,
         new_password: newPassword
