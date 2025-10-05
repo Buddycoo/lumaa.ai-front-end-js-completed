@@ -42,6 +42,13 @@ const Overview = () => {
     category: user?.category || 'real_estate',
     botStatus: user?.status || 'active'
   };
+
+  // System status for admin
+  const systemStatus = {
+    ai: true,
+    calls: true,
+    whatsapp: false
+  };
   
   const StatsCard = ({ title, value, icon: Icon, trend, trendUp, className = '' }) => {
     return (
