@@ -991,71 +991,94 @@ class PostgreSQLAPITester:
             return False
 
     def run_all_tests(self):
-        """Run comprehensive API tests"""
-        print("🚀 Starting Comprehensive Production API Tests")
-        print("-" * 60)
+        """Run comprehensive PostgreSQL API tests"""
+        print("🚀 Starting PostgreSQL-based Lumaa AI Backend Tests")
+        print("-" * 80)
         
-        # Test 1: Backend connectivity
+        # Test 1: PostgreSQL Backend connectivity
         if not self.test_backend_connectivity():
-            print("\n❌ Backend connectivity failed. Stopping tests.")
+            print("\n❌ PostgreSQL backend connectivity failed. Stopping tests.")
             return self.generate_summary()
         
-        print("\n📋 AUTHENTICATION TESTS")
-        print("-" * 30)
+        # Test 2: System status (should show PostgreSQL)
+        self.test_system_status()
         
-        # Test 2: Valid admin login
+        print("\n📋 AUTHENTICATION ENDPOINTS")
+        print("-" * 40)
+        
+        # Test 3: Valid admin login (admin@lumaa.ai/pass)
         self.admin_token = self.test_login_valid_admin()
         
-        # Test 3: Valid user login  
+        # Test 4: Valid user login (user@lumaa.ai/pass)
         self.user_token = self.test_login_valid_user()
         
-        # Test 4: Invalid credentials
+        # Test 5: Invalid credentials
         self.test_login_invalid_email()
         self.test_login_wrong_password()
         
-        # Test 5: JWT token structure
+        # Test 6: JWT token structure
         if self.admin_token:
             self.test_jwt_token_structure(self.admin_token)
         
-        print("\n🔐 ENHANCED AUTHENTICATION TESTS")
-        print("-" * 40)
-        
-        # Test 6: Enhanced /auth/me endpoints
+        # Test 7: /auth/me with valid token
         self.test_enhanced_auth_me_admin()
         self.test_enhanced_auth_me_user()
         
-        # Test 7: PIN verification
+        # Test 8: PIN verification (1234 for admin, 5678 for user)
         self.test_pin_verification_admin()
         self.test_pin_verification_user()
         
-        print("\n👑 ADMIN MANAGEMENT TESTS")
+        print("\n👑 ADMIN ENDPOINTS")
         print("-" * 30)
         
-        # Test 8: Admin user management
+        # Test 9: GET /api/admin/users (list all users)
         self.test_admin_get_users()
         self.test_user_access_admin_endpoint()
+        
+        # Test 10: GET /api/admin/overview (revenue, metrics, top users)
         self.test_admin_overview()
         
-        print("\n🤖 BOT SETTINGS TESTS")
+        # Test 11: GET /api/admin/bot-settings/real_estate
+        self.test_bot_settings_real_estate()
+        
+        # Test 12: PUT /api/admin/bot-settings/sales (update with model: gpt-4, temperature: 0.8)
+        self.test_bot_settings_update_sales()
+        
+        # Test 13: POST /api/admin/users (create new user with all required fields)
+        self.test_admin_create_user()
+        
+        print("\n👤 USER ENDPOINTS")
         print("-" * 25)
         
-        # Test 9: Bot settings management
-        self.test_bot_settings_admin()
+        # Test 14: GET /api/user/bot-settings (user's bot settings)
         self.test_user_bot_settings()
         
-        print("\n📊 USER OPERATIONS TESTS")
+        # Test 15: PUT /api/user/bot-settings (update prompt and opening_message)
+        self.test_user_prompt_persistence()
+        
+        # Test 16: GET /api/user/call-logs
+        self.test_user_call_logs()
+        
+        # Test 17: GET /api/user/leads
+        self.test_user_leads()
+        
+        print("\n🔍 DATA VERIFICATION")
         print("-" * 30)
         
-        # Test 10: User operations
-        self.test_csv_upload_sales_user()
-        self.test_csv_upload_non_sales_user()
-        self.test_user_call_logs()
-        self.test_system_status()
+        # Test 18: Verify demo users exist with sip_endpoints and concurrency fields
+        self.test_demo_users_verification()
         
-        # Test 11: Protected endpoints
+        print("\n🔐 SECURITY TESTS")
+        print("-" * 25)
+        
+        # Test 19: Protected endpoints
         self.test_protected_endpoint_with_token(self.admin_token)
         self.test_protected_endpoint_without_token()
         self.test_protected_endpoint_invalid_token()
+        
+        # Test 20: Category-based restrictions (CSV upload for sales only)
+        self.test_csv_upload_sales_user()
+        self.test_csv_upload_non_sales_user()
         
         return self.generate_summary()
     
