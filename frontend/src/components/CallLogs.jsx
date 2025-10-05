@@ -49,14 +49,18 @@ const CallLogs = () => {
     }
   ];
   
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'SUCCESS':
+  const getOutcomeColor = (outcome) => {
+    switch (outcome) {
+      case 'Interested':
         return 'bg-green-900 text-green-300';
-      case 'FAILED':
+      case 'Callback Requested':
+        return 'bg-blue-900 text-blue-300';
+      case 'Not Interested':
         return 'bg-red-900 text-red-300';
-      case 'BUSY':
+      case 'Voicemail':
         return 'bg-yellow-900 text-yellow-300';
+      case 'No Answer':
+        return 'bg-gray-900 text-gray-300';
       default:
         return 'bg-gray-900 text-gray-300';
     }
