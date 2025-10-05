@@ -154,6 +154,23 @@ class PostgreSQLManager:
             session.close()
 
 
+    async def update_user_status(self, user_id: str, status: 'UserStatus', updated_by: str, pause_reason: Optional[str] = None) -> bool:
+        """Update user status and pause reason"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.id == user_id).first()
+            if not user:
+                return False
+            
+            user.status = status
+            user.pause_reason = pause_reason
+            user.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            return True
+        finally:
+            session.close()
+
+
     # Password Management
     async def change_password(self, user_id: str, current_password: str, new_password: str) -> bool:
         """Change user password"""
