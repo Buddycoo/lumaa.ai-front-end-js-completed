@@ -521,6 +521,90 @@ class PostgreSQLManager:
         finally:
             session.close()
 
+    # Notification Management
+    async def create_notification(self, notification_data: dict) -> str:
+        """Create a new notification"""
+        session = self.get_session()
+        try:
+            notification = Notification(
+                user_id=notification_data.get("user_id"),
+                type=NotificationType(notification_data["type"]),
+                title=notification_data["title"],
+                message=notification_data["message"],
+                data=notification_data.get("data"),
+                contact_name=notification_data.get("contact_name"),
+                contact_email=notification_data.get("contact_email"),
+                contact_phone=notification_data.get("contact_phone"),
+                contact_company=notification_data.get("contact_company")
+            )
+            
+            session.add(notification)
+            session.commit()
+            session.refresh(notification)
+            return notification.id
+        finally:
+            session.close()
+    
+    async def get_user_notifications(self, user_id: str, unread_only: bool = False) -> List[Dict]:
+        """Get notifications for a user"""
+        session = self.get_session()
+        try:
+            query = session.query(Notification).filter(Notification.user_id == user_id)
+            if unread_only:
+                query = query.filter(Notification.is_read == False)
+            
+            notifications = query.order_by(Notification.created_at.desc()).limit(50).all()
+            return [self._notification_to_dict(notif) for notif in notifications]
+        finally:
+            session.close()
+    
+    async def get_admin_notifications(self, unread_only: bool = False) -> List[Dict]:
+        """Get admin notifications (user_id is null)"""
+        session = self.get_session()
+        try:
+            query = session.query(Notification).filter(Notification.user_id == None)
+            if unread_only:
+                query = query.filter(Notification.is_read == False)
+            
+            notifications = query.order_by(Notification.created_at.desc()).limit(100).all()
+            return [self._notification_to_dict(notif) for notif in notifications]
+        finally:
+            session.close()
+    
+    async def mark_notification_read(self, notification_id: str) -> bool:
+        """Mark notification as read"""
+        session = self.get_session()
+        try:
+            notification = session.query(Notification).filter(Notification.id == notification_id).first()
+            if notification:
+                notification.is_read = True
+                session.commit()
+                return True
+            return False
+        finally:
+            session.close()
+    
+    async def get_unread_count(self, user_id: Optional[str] = None) -> int:
+        """Get unread notification count"""
+        session = self.get_session()
+        try:
+            if user_id:
+                count = session.query(Notification).filter(
+                    Notification.user_id == user_id,
+                    Notification.is_read == False
+                ).count()
+            else:
+                # Admin notifications
+                count = session.query(Notification).filter(
+                    Notification.user_id == None,
+                    Notification.is_read == False
+                ).count()
+            return count
+        finally:
+            session.close()
+
+
+
     # Helper methods to convert SQLAlchemy objects to dicts
     def _user_to_dict(self, user: User) -> Dict:
         return {
