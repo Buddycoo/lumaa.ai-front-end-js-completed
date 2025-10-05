@@ -212,6 +212,11 @@ class UserResponse(BaseModel):
 
 class AdminUserResponse(UserResponse):
     revenue_generated: float  # Admins can see revenue
+    credits_balance: float
+    monthly_plan_cost: float
+    next_billing_date: datetime
+    payment_status: PaymentStatus
+    days_until_billing: int
     
 class UserDashboardResponse(BaseModel):
     id: str
