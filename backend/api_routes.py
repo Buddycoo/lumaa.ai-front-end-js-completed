@@ -37,9 +37,8 @@ async def login(credentials: UserLogin, pg_db_manager: PostgreSQLManager = Depen
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials - use password: pass")
     
-    # Check if user is blocked
-    if user.get("status") == "blocked":
-        raise HTTPException(status_code=401, detail="You have been blocked by the admin. Please contact support.")
+    # Allow paused/blocked users to login but they will see blocking UI
+    # Removed: if user.get("status") == "blocked": raise HTTPException(...)
     
     access_token, refresh_token = generate_tokens(user)
     
@@ -51,6 +50,7 @@ async def login(credentials: UserLogin, pg_db_manager: PostgreSQLManager = Depen
             role=user["role"],
             category=user.get("category", "sales"),
             status=user.get("status", "active"),
+            pause_reason=user.get("pause_reason"),
             minutes_used=user.get("min_used", 0),
             minutes_allocated=user.get("min_subscribed", 1000),
             revenue_generated=user.get("revenue_generated", 0.0),
