@@ -337,8 +337,6 @@ async def upload_leads_csv(
 async def get_system_status():
 
     return {"status": "operational", "database": "PostgreSQL"}
-
-# Password Management Endpoints
 @router.post("/auth/change-password", response_model=dict)
 async def change_password(
     request: PasswordChangeRequest,
