@@ -545,6 +545,8 @@ async def initialize_demo_data(db_manager: PostgreSQLManager):
             "pin_code": "5678",
             "function": "Real Estate Agent",
             "sip_endpoint": "sip:user@lumaa.ai",
+            "sip_endpoints": "sip:user1@lumaa.ai,sip:user2@lumaa.ai",
+            "concurrency": 5,
             "prompt": "You are a real estate AI assistant. Be helpful with property inquiries.",
             "min_subscribed": 1000,
             "min_used": 234,
