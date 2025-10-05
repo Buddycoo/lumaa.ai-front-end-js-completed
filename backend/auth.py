@@ -128,4 +128,42 @@ def generate_tokens(user: dict):
     )
     refresh_token = create_refresh_token(data={"sub": user["email"]})
     
+
+
+async def authenticate_user_pg(pg_db_manager, email: str, password: str):
+    """Authenticate user using PostgreSQL database"""
+    user_data = await pg_db_manager.authenticate_user(email, password)
+    return user_data
+
+async def verify_token_pg(pg_db_manager, credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify token and return user from PostgreSQL"""
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_email: str = payload.get("sub")
+        token_type: str = payload.get("type")
+        
+        if user_email is None or token_type != "access":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Find user in PostgreSQL
+    user = await pg_db_manager.get_user_by_email(user_email)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return user
+
     return access_token, refresh_token
