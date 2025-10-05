@@ -177,18 +177,36 @@ const LandingPage = () => {
           >
             Contact
           </button>
+          <a 
+            href="http://localhost:3001/login" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary text-sm px-4 py-2 min-h-10 ml-4 no-underline"
+            onClick={() => trackButtonClick('Login', 'Header Navigation')}
+          >
+            Login
+          </a>
         </nav>
         
-        {/* Mobile CTA Button */}
-        <div className="md:hidden">
+        {/* Mobile Navigation */}
+        <div className="md:hidden flex items-center gap-2">
+          <a 
+            href="http://localhost:3001/login" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary text-xs px-3 py-2 min-h-8 no-underline"
+            onClick={() => trackButtonClick('Login', 'Mobile Header')}
+          >
+            Login
+          </a>
           <Button 
-            className="btn-primary text-sm px-4 py-2 min-h-10"
+            className="btn-primary text-xs px-3 py-2 min-h-8"
             onClick={() => {
               trackButtonClick('Get Demo', 'Mobile Header');
               scrollToSection('contact');
             }}
           >
-            Get Demo
+            Demo
           </Button>
         </div>
       </header>
