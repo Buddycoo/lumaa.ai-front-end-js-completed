@@ -151,12 +151,9 @@ async function main() {
   console.log('✅ Created sample clients');
 
   console.log('\n🎉 Database seeded successfully!');
-  console.log('\n📝 Login Credentials:');
-  console.log('SuperAdmin: admin@lumaa.ai / admin123');
-  console.log('Admin: manager@lumaa.ai / admin123');
-  console.log('User: ahmed@emirates.ae / user123');
-  console.log('User: sarah@techinnovations.ae / user123');
-  console.log('User: maria@luxuryhotels.ae / user123');
+  console.log('\n📝 Demo Login Credentials:');
+  console.log('👑 Admin Dashboard: admin@lumaa.ai / pass');
+  console.log('👤 User Dashboard:  user@lumaa.ai / pass');
 }
 
 main()
