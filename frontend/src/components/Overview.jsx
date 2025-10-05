@@ -103,20 +103,20 @@ const Overview = () => {
           </div>
         </div>
         
-        {/* Stats Cards */}
+        {/* Admin Stats Cards - Focus on Revenue & User Management */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
-            title="Total Calls"
-            value={stats.totalCalls.toLocaleString()}
-            icon={Phone}
+            title="Total Revenue"
+            value={`$${adminStats.totalRevenue.toLocaleString()}`}
+            icon={DollarSign}
             trend="+12% from last month"
             trendUp={true}
           />
           
           <StatsCard
-            title="Total Revenue"
-            value={formatCurrency(stats.totalRevenue)}
-            icon={DollarSign}
+            title="Total Minutes Used"
+            value={adminStats.totalMinutes.toLocaleString()}
+            icon={Clock}
             trend="+8% from last month"
             trendUp={true}
           />
