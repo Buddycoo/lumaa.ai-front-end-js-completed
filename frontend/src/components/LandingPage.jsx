@@ -96,6 +96,20 @@ const LandingPage = () => {
       trackButtonClick('Schedule Demo', 'Contact Form');
       trackDemo('contact_form');
       
+      // Submit to our backend API to create admin notification
+      try {
+        await axios.post('/api/contact', {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          message: formData.message
+        });
+      } catch (backendError) {
+        console.error('Failed to create notification:', backendError);
+        // Continue with external form submission even if backend fails
+      }
+      
       // Get form configuration
       const config = getFormConfig();
       
