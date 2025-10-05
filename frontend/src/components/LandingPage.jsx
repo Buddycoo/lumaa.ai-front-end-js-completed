@@ -91,17 +91,26 @@ const LandingPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Mock form submission
-    setTimeout(() => {
-      setSubmitStatus('success');
-      setIsSubmitting(false);
-      setFormData({ name: '', email: '', company: '', phone: '', message: '' });
+    try {
+      // Track form submission attempt
+      trackButtonClick('Schedule Demo', 'Contact Form');
+      trackDemo('contact_form');
       
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
-    }, 1500);
-  };
+      // Get form configuration
+      const config = getFormConfig();
+      
+      // Submit to CRM/Email services with fallbacks
+      const result = await submitFormWithFallbacks(formData, config);
+      
+      if (result.success) {
+        setSubmitStatus('success');
+        
+        // Track successful conversion
+        trackFormSubmission('demo_request', true);
+        trackPixelLead(100); // Assign lead value
+        
+        setFormData({ name: '', email: '', company: '', phone: '', message: '' });
+      } else {\n        setSubmitStatus('error');\n        trackFormSubmission('demo_request', false);\n      }\n    } catch (error) {\n      setSubmitStatus('error');\n      trackFormSubmission('demo_request', false);\n    }\n    \n    setIsSubmitting(false);\n    \n    // Clear status after 5 seconds\n    setTimeout(() => {\n      setSubmitStatus(null);\n    }, 5000);\n  };
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
