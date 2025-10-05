@@ -352,13 +352,13 @@ class DatabaseManager:
         # Get top users by revenue
         top_revenue_users = await self.users.find(
             {"role": {"$ne": "admin"}}, 
-            {"name": 1, "revenue_generated": 1}
+            {"_id": 0, "name": 1, "revenue_generated": 1}
         ).sort("revenue_generated", -1).limit(5).to_list(length=None)
         
         # Get top users by minutes
         top_minutes_users = await self.users.find(
             {"role": {"$ne": "admin"}}, 
-            {"name": 1, "minutes_used": 1}
+            {"_id": 0, "name": 1, "minutes_used": 1}
         ).sort("minutes_used", -1).limit(5).to_list(length=None)
         
         system_settings = await self.get_system_settings()
