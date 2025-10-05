@@ -161,28 +161,39 @@ const LandingPage = () => {
           <div className="dark-content-container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-60 items-center">
               {/* Left Content */}
-              <div className="space-y-40">
+              <AnimatedSection 
+                animationType="fade-up" 
+                sectionName="hero"
+                className="space-y-40"
+              >
                 <div>
                   <h1 className="display-huge mb-6">{heroData.headline}</h1>
                   <p className="body-large mb-40">{heroData.subtext}</p>
                   <div className="flex flex-col sm:flex-row gap-6">
                     <Button 
-                      className="btn-primary"
-                      onClick={() => scrollToSection('contact')}
+                      className="btn-primary transform hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-brand-primary/20"
+                      onClick={() => {
+                        trackButtonClick('Get a Demo', 'Hero Section');
+                        trackDemo('hero_cta');
+                        scrollToSection('contact');
+                      }}
                     >
                       {heroData.primaryCTA}
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                     <Button 
-                      className="btn-secondary"
-                      onClick={() => scrollToSection('features')}
+                      className="btn-secondary transform hover:scale-105 transition-all duration-300"
+                      onClick={() => {
+                        trackButtonClick('See How It Works', 'Hero Section');
+                        scrollToSection('features');
+                      }}
                     >
                       {heroData.secondaryCTA}
-                      <ChevronDown className="ml-2 h-5 w-5" />
+                      <ChevronDown className="ml-2 h-5 w-5 transition-transform group-hover:translate-y-1" />
                     </Button>
                   </div>
                 </div>
-              </div>
+              </AnimatedSection>
               
               {/* Right - Spline 3D Animation */}
               <div className="flex justify-center">
