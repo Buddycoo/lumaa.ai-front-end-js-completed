@@ -144,208 +144,268 @@ const BotSettings = () => {
     }
   };
   
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-white">Loading bot settings...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Bot Settings
-          </h1>
+          <h1 className="text-2xl font-bold text-white">Bot Settings</h1>
           <p className="text-gray-400">
-            Configure your AI assistant's behavior and responses
+            {isAdmin 
+              ? 'Configure universal bot settings for each category' 
+              : 'Customize your AI assistant\'s behavior'
+            }
           </p>
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Settings */}
-        <Card className="lg:col-span-2 bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Settings className="h-5 w-5 text-[#00FFD1]" />
-              AI Configuration
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Customize your AI assistant's personality and responses
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* User Editable Fields */}
-            <div className="space-y-2">
-              <Label className="text-gray-300">Opening Message</Label>
-              <p className="text-xs text-gray-500">Short greeting message (max 500 characters)</p>
-              <Textarea
-                placeholder="Hello! I'm your AI assistant from Lumaa AI. How can I help you today?"
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[80px]"
-                value={settings.openingMessage}
-                onChange={(e) => setSettings({ ...settings, openingMessage: e.target.value })}
-                maxLength={500}
-              />
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-gray-300">System Prompt</Label>
-              <p className="text-xs text-gray-500">Detailed instructions for AI behavior (max 2000 characters)</p>
-              <Textarea
-                placeholder="You are a professional AI assistant. Be helpful, courteous, and provide accurate information..."
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[150px]"
-                value={settings.prompt}
-                onChange={(e) => setSettings({ ...settings, prompt: e.target.value })}
-                maxLength={2000}
-              />
-            </div>
-            
-            {/* Read-Only Admin Controlled Fields */}
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <h3 className="text-white font-medium mb-3 flex items-center gap-2">
-                <Settings className="h-4 w-4 text-gray-400" />
-                Admin Controlled Settings (Read-Only)
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <Label className="text-gray-400">AI Model</Label>
-                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm">
-                    {settings.model}
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <Label className="text-gray-400">Temperature</Label>
-                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm">
-                    {settings.temperature}
-                  </div>
-                </div>
+      {isAdmin ? (
+        /* ADMIN INTERFACE - Model & Temperature per Category */
+        <div className="space-y-6">
+          {/* Category Selection */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">Select Category</CardTitle>
+              <p className="text-gray-400">Choose category to configure bot settings</p>
+            </CardHeader>
+            <CardContent>
+              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  {categories.map(category => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-1">
-                  <Label className="text-gray-400">Category</Label>
-                  <div className="bg-gray-700 px-3 py-2 rounded text-gray-300 text-sm capitalize">
-                    {settings.category.replace('_', ' ')}
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                These settings are managed by your administrator
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-gray-300">Temperature ({settings.temperature})</Label>
-                <Input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={settings.temperature}
-                  onChange={(e) => setSettings({ ...settings, temperature: parseFloat(e.target.value) })}
-                  className="bg-gray-800 border-gray-700"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>Conservative</span>
-                  <span>Creative</span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-gray-300">Response Length</Label>
-                <Input
-                  type="number"
-                  placeholder="150"
-                  value={settings.responseLength}
-                  onChange={(e) => setSettings({ ...settings, responseLength: parseInt(e.target.value) })}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-                />
-              </div>
-            </div>
-            
-            <Button 
-              onClick={handleSave}
-              disabled={isLoading}
-              className="w-full bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Saving...
-                </div>
-              ) : (
+          {/* Category Settings */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Bot className="h-5 w-5 text-[#00FFD1]" />
+                {categories.find(c => c.value === selectedCategory)?.label} Settings
+              </CardTitle>
+              <p className="text-gray-400">Universal settings for all {categories.find(c => c.value === selectedCategory)?.label} users</p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {adminSettings[selectedCategory] && (
                 <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Configuration
+                  {/* Model Selection */}
+                  <div>
+                    <Label className="text-gray-300 flex items-center gap-2">
+                      <Cpu className="h-4 w-4" />
+                      AI Model
+                    </Label>
+                    <Select 
+                      value={adminSettings[selectedCategory].model} 
+                      onValueChange={(value) => setAdminSettings({
+                        ...adminSettings,
+                        [selectedCategory]: {
+                          ...adminSettings[selectedCategory],
+                          model: value
+                        }
+                      })}
+                    >
+                      <SelectTrigger className="bg-gray-800 border-gray-700 text-white mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        {models.map(model => (
+                          <SelectItem key={model.value} value={model.value}>
+                            {model.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Temperature Control */}
+                  <div>
+                    <Label className="text-gray-300 flex items-center gap-2">
+                      <Thermometer className="h-4 w-4" />
+                      Temperature: {adminSettings[selectedCategory].temperature}
+                    </Label>
+                    <p className="text-xs text-gray-500 mb-3">Controls creativity vs precision (0 = focused, 2 = creative)</p>
+                    <Slider
+                      value={[adminSettings[selectedCategory].temperature]}
+                      onValueChange={([value]) => setAdminSettings({
+                        ...adminSettings,
+                        [selectedCategory]: {
+                          ...adminSettings[selectedCategory],
+                          temperature: value
+                        }
+                      })}
+                      max={2}
+                      min={0}
+                      step={0.1}
+                      className="mt-2"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Precise</span>
+                      <span>Balanced</span>
+                      <span>Creative</span>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <Button 
+                    onClick={handleSaveAdminSettings}
+                    disabled={saving}
+                    className="w-full bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+                  >
+                    {saving ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </div>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Settings for {categories.find(c => c.value === selectedCategory)?.label}
+                      </>
+                    )}
+                  </Button>
                 </>
               )}
-            </Button>
-          </CardContent>
-        </Card>
-        
-        {/* Quick Settings */}
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-white">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Bot Status</span>
-                <span className="px-2 py-1 bg-green-900 text-green-300 rounded-full text-xs">
-                  Active
-                </span>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                onClick={() => toast.info('Test message sent!')}
-              >
-                Test Bot Response
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                onClick={() => {
-                  setSettings({
-                    openingMessage: "Hello! I'm your AI assistant from Lumaa AI. How can I help you today?",
-                    model: 'gpt-4.1',
-                    temperature: 0.7,
-                    responseLength: 150,
-                    category: 'sales'
-                  });
-                  toast.info('Settings reset to default');
-                }}
-              >
-                Reset to Default
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                onClick={() => toast.info('Settings exported!')}
-              >
-                Export Settings
-              </Button>
-            </div>
-            
-            <div className="pt-4 border-t border-gray-700">
-              <h4 className="text-white font-medium mb-2">Performance Stats</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Avg Response Time</span>
-                  <span className="text-white">1.2s</span>
+            </CardContent>
+          </Card>
+
+          {/* Info Card */}
+          <Card className="bg-blue-900/20 border-blue-800">
+            <CardContent className="p-4">
+              <p className="text-blue-300 text-sm">
+                <strong>Note:</strong> These settings apply to all users in the selected category. 
+                Users can customize their opening messages and prompts, but model and temperature 
+                are controlled here.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        /* USER INTERFACE - Opening Message & Prompt Only */
+        <div className="space-y-6">
+          {/* Current Configuration (Read-Only) */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Settings className="h-4 w-4 text-[#00FFD1]" />
+                Current Configuration
+              </CardTitle>
+              <p className="text-gray-400">Admin-controlled settings</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800">
+                  <div className="flex items-center gap-3">
+                    <Cpu className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-300">Model</span>
+                  </div>
+                  <span className="text-white font-medium">{userSettings.model}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Success Rate</span>
-                  <span className="text-green-400">94%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Total Interactions</span>
-                  <span className="text-white">1,247</span>
+                
+                <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800">
+                  <div className="flex items-center gap-3">
+                    <Thermometer className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-300">Temperature</span>
+                  </div>
+                  <span className="text-white font-medium">{userSettings.temperature}</span>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+
+          {/* User Editable Settings */}
+          <Card className="bg-gray-900 border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white">Your Bot Customization</CardTitle>
+              <p className="text-gray-400">Personalize your AI assistant's responses</p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Opening Message */}
+              <div>
+                <Label htmlFor="opening" className="text-gray-300">Opening Message</Label>
+                <p className="text-xs text-gray-500 mb-2">First message your AI sends (max 500 characters)</p>
+                <Textarea
+                  id="opening"
+                  value={userSettings.opening_message}
+                  onChange={(e) => setUserSettings({...userSettings, opening_message: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  rows={3}
+                  maxLength={500}
+                  placeholder="Hello! I'm your AI assistant. How can I help you today?"
+                />
+                <div className="text-xs text-gray-500 text-right mt-1">
+                  {userSettings.opening_message?.length || 0}/500 characters
+                </div>
+              </div>
+
+              {/* System Prompt */}
+              <div>
+                <Label htmlFor="prompt" className="text-gray-300">System Prompt</Label>
+                <p className="text-xs text-gray-500 mb-2">Detailed instructions for AI behavior (max 2000 characters)</p>
+                <Textarea
+                  id="prompt"
+                  value={userSettings.prompt}
+                  onChange={(e) => setUserSettings({...userSettings, prompt: e.target.value})}
+                  className="bg-gray-800 border-gray-700 text-white"
+                  rows={6}
+                  maxLength={2000}
+                  placeholder="You are a professional AI assistant. Be helpful, courteous, and provide accurate information..."
+                />
+                <div className="text-xs text-gray-500 text-right mt-1">
+                  {userSettings.prompt?.length || 0}/2000 characters
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <Button 
+                onClick={handleSaveUserSettings}
+                disabled={saving}
+                className="w-full bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90"
+              >
+                {saving ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </div>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Settings
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Tips */}
+          <Card className="bg-blue-900/20 border-blue-800">
+            <CardContent className="p-4">
+              <h3 className="text-blue-400 font-medium mb-2">💡 Tips for Better Bot Performance</h3>
+              <ul className="text-blue-300 text-sm space-y-1">
+                <li>• Keep opening messages friendly and professional</li>
+                <li>• Be specific in your system prompt about tone and style</li>
+                <li>• Include context about your business in the prompt</li>
+                <li>• Test your settings with sample conversations</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
