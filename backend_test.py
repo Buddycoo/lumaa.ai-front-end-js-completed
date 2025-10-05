@@ -36,12 +36,14 @@ print(f"🔧 Testing backend at: {BACKEND_URL}")
 print(f"📅 Test started at: {datetime.now()}")
 print("=" * 60)
 
-class AuthenticationTester:
+class ComprehensiveAPITester:
     def __init__(self, base_url):
         self.base_url = base_url.rstrip('/')
         self.api_url = f"{self.base_url}/api"
         self.session = requests.Session()
         self.test_results = []
+        self.admin_token = None
+        self.user_token = None
         
     def log_test(self, test_name, success, message, details=None):
         """Log test results"""
