@@ -19,6 +19,13 @@ const Dashboard = () => {
   
   // For now, use existing components but we'll modify them to match refined requirements
   const isAdmin = user?.role === 'admin';
+  const isPaused = user?.status === 'paused';
+  const pauseReason = user?.pause_reason;
+
+  // Show blocked modal for paused users (except admins)
+  if (isPaused && !isAdmin) {
+    return <BlockedUserModal reason={pauseReason} />;
+  }
   
   return (
     <DashboardLayout>
