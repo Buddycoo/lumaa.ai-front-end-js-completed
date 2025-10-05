@@ -52,7 +52,7 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "lumaa_users"
     
     id = Column(String, primary_key=True, default=generate_uuid)
     name = Column(String(255), nullable=False)
