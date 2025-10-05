@@ -256,9 +256,7 @@ class AdminOverviewResponse(BaseModel):
     total_minutes_used: int
     total_users: int
     active_users: int
-    top_users_by_revenue: List[Dict[str, Any]]
-    top_users_by_minutes: List[Dict[str, Any]]
-    is_global_paused: bool
+    top_users: List[TopUserResponse]
 
 class TokenResponse(BaseModel):
     user: UserResponse
