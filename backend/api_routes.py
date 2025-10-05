@@ -203,16 +203,6 @@ async def resume_all_users(
         "count": resumed_count
     }
 
-    user_id: str,
-    update_data: UserUpdateRequest,
-    admin_user: dict = Depends(get_admin_user),
-    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
-):
-    success = await pg_db_manager.update_user(user_id, update_data.dict(exclude_unset=True))
-    if not success:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"message": "User updated successfully"}
-
 @router.post("/admin/users/{user_id}/pause", response_model=dict)
 async def pause_user(
     user_id: str,
