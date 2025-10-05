@@ -139,6 +139,62 @@ async def create_user(
 
 @router.put("/admin/users/{user_id}", response_model=dict)
 async def update_user(
+
+
+@router.post("/admin/users/pause-all", response_model=dict)
+async def pause_all_users(
+    pause_request: GlobalPauseRequest,
+    admin_user: dict = Depends(get_admin_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    # Verify admin PIN (1509)
+    if pause_request.admin_pin != "1509":
+        raise HTTPException(status_code=403, detail="Invalid PIN. Admin PIN required to pause all users.")
+    
+    from database_models import UserStatus
+    users = await pg_db_manager.get_all_users(include_admins=False)
+    paused_count = 0
+    
+    for user in users:
+        success = await pg_db_manager.update_user_status(
+            user["id"], 
+            UserStatus.PAUSED, 
+            admin_user["id"],
+            pause_reason=pause_request.reason
+        )
+        if success:
+            paused_count += 1
+    
+    return {
+        "message": f"Paused {paused_count} user(s) successfully",
+        "count": paused_count,
+        "reason": pause_request.reason
+    }
+
+@router.post("/admin/users/resume-all", response_model=dict)
+async def resume_all_users(
+    admin_user: dict = Depends(get_admin_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    from database_models import UserStatus
+    users = await pg_db_manager.get_all_users(include_admins=False)
+    resumed_count = 0
+    
+    for user in users:
+        success = await pg_db_manager.update_user_status(
+            user["id"], 
+            UserStatus.ACTIVE, 
+            admin_user["id"],
+            pause_reason=None
+        )
+        if success:
+            resumed_count += 1
+    
+    return {
+        "message": f"Resumed {resumed_count} user(s) successfully",
+        "count": resumed_count
+    }
+
     user_id: str,
     update_data: UserUpdateRequest,
     admin_user: dict = Depends(get_admin_user),
