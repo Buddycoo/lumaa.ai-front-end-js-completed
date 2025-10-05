@@ -267,31 +267,48 @@ const LandingPage = () => {
       {/* Why Lumaa AI Section */}
       <section id="features" className="pad-xxlarge bg-bg-secondary">
         <div className="dark-content-container">
-          <div className="text-center mb-60">
+          <AnimatedSection 
+            animationType="fade-up" 
+            sectionName="features"
+            className="text-center mb-60"
+          >
             <h2 className="display-large mb-6">{whyLumaaData.title}</h2>
-          </div>
+          </AnimatedSection>
           
           <div className="dark-grid">
             {whyLumaaData.features.map((feature, index) => {
               const IconComponent = iconMap[feature.icon];
               return (
-                <Card key={index} className="bg-bg-primary border-border-subtle p-40 text-center dark-transition dark-hover">
-                  <div className="flex justify-center mb-6">
-                    <IconComponent className="h-12 w-12 text-brand-primary" />
-                  </div>
-                  <h3 className="heading-2 mb-4">{feature.title}</h3>
-                  <p className="body-medium">{feature.description}</p>
-                </Card>
+                <AnimatedSection
+                  key={index}
+                  animationType="scale"
+                  delay={index * 150}
+                >
+                  <Card className="bg-bg-primary border-border-subtle p-40 text-center dark-transition dark-hover group cursor-pointer transform hover:scale-105 hover:shadow-xl hover:shadow-brand-primary/20">
+                    <div className="flex justify-center mb-6">
+                      <IconComponent className="h-12 w-12 text-brand-primary transition-all duration-300 group-hover:scale-125 group-hover:rotate-12" />
+                    </div>
+                    <h3 className="heading-2 mb-4 group-hover:text-brand-primary transition-colors duration-300">{feature.title}</h3>
+                    <p className="body-medium">{feature.description}</p>
+                  </Card>
+                </AnimatedSection>
               );
             })}
           </div>
           
-          <div className="text-center mt-60">
-            <Button className="btn-primary">
+          <AnimatedSection 
+            animationType="fade-up" 
+            delay={600}
+            className="text-center mt-60"
+          >
+            <Button 
+              className="btn-primary transform hover:scale-105 transition-all duration-300 hover:shadow-lg hover:shadow-brand-primary/20"
+              onClick={() => trackButtonClick('Learn More', 'Features Section')}
+            >
               {whyLumaaData.subtitle}
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
