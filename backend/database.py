@@ -191,7 +191,7 @@ class DatabaseManager:
 
     async def get_user_leads(self, user_id: str, limit: int = 100) -> List[dict]:
         """Get leads for a user"""
-        leads = await self.leads.find({"user_id": user_id}).limit(limit).to_list(length=None)
+        leads = await self.leads.find({"user_id": user_id}, {"_id": 0}).limit(limit).to_list(length=None)
         return [self._parse_from_mongo(lead) for lead in leads]
 
     # Call Logs
