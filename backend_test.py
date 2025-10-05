@@ -36,7 +36,7 @@ print(f"🔧 Testing PostgreSQL-based Lumaa AI backend at: {BACKEND_URL}")
 print(f"📅 Test started at: {datetime.now()}")
 print("=" * 80)
 
-class ComprehensiveAPITester:
+class PostgreSQLAPITester:
     def __init__(self, base_url):
         self.base_url = base_url.rstrip('/')
         self.api_url = f"{self.base_url}/api"
