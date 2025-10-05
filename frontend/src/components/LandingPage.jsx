@@ -99,7 +99,7 @@ const LandingPage = () => {
       
       // Submit to our backend API to create admin notification
       try {
-        await axios.post('/api/contact', {
+        await axios.post('/contact', {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
