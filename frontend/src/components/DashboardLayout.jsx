@@ -47,7 +47,7 @@ const DashboardLayout = ({ children }) => {
     }
   ];
 
-  // User menu - includes call logs, bot settings, conditional CSV upload
+  // User menu - includes call logs, bot settings, billing, conditional CSV upload
   const userMenuItems = [
     {
       icon: LayoutDashboard,
@@ -63,6 +63,11 @@ const DashboardLayout = ({ children }) => {
       icon: Settings,
       label: 'Bot Settings',
       href: '/dashboard/settings'
+    },
+    {
+      icon: DollarSign,
+      label: 'Billing',
+      href: '/dashboard/billing'
     }
   ];
 
