@@ -5,7 +5,7 @@ import csv
 import io
 from models import *
 from database import DatabaseManager
-from auth import verify_token, generate_tokens, UserResponse
+from auth import verify_token, generate_tokens, UserLogin
 
 router = APIRouter(prefix="/api")
 
