@@ -1449,6 +1449,29 @@ class PostgreSQLAPITester:
         self.test_csv_upload_sales_user()
         self.test_csv_upload_non_sales_user()
         
+        print("\n🔔 NEW FEATURES TESTING")
+        print("-" * 35)
+        
+        # Test 21: Admin Send Updates
+        self.test_admin_send_update_all_users()
+        self.test_admin_send_update_category()
+        
+        # Test 22: Admin Overview with Real Data
+        self.test_admin_overview_real_data()
+        
+        # Test 23: Contact Form
+        self.test_contact_form_submission()
+        
+        # Test 24: Notifications System
+        self.test_admin_notifications()
+        self.test_admin_unread_count()
+        self.test_user_notifications()
+        self.test_user_unread_count()
+        
+        # Test 25: Password Management
+        self.test_change_password()
+        self.test_forgot_password()
+        
         return self.generate_summary()
     
     def generate_summary(self):
