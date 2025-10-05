@@ -169,25 +169,25 @@ const Overview = () => {
                     <p className="text-sm text-gray-400">{service.description}</p>
                     <div className="flex items-center mt-2 gap-2">
                       <div className={`w-2 h-2 rounded-full ${
-                        stats.systemStatus[service.key] ? 'bg-green-400' : 'bg-red-400'
+                        systemStatus[service.key] ? 'bg-green-400' : 'bg-red-400'
                       }`} />
                       <span className={`text-xs ${
-                        stats.systemStatus[service.key] ? 'text-green-400' : 'text-red-400'
+                        systemStatus[service.key] ? 'text-green-400' : 'text-red-400'
                       }`}>
-                        {stats.systemStatus[service.key] ? 'Online' : 'Offline'}
+                        {systemStatus[service.key] ? 'Online' : 'Offline'}
                       </span>
                     </div>
                   </div>
                   
                   <Button
                     size="sm"
-                    variant={stats.systemStatus[service.key] ? 'destructive' : 'default'}
-                    className={stats.systemStatus[service.key] 
+                    variant={systemStatus[service.key] ? 'destructive' : 'default'}
+                    className={systemStatus[service.key] 
                       ? 'bg-red-600 hover:bg-red-700' 
                       : 'bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90'
                     }
                   >
-                    {stats.systemStatus[service.key] ? 'Disable' : 'Enable'}
+                    {systemStatus[service.key] ? 'Disable' : 'Enable'}
                   </Button>
                 </div>
               ))}
