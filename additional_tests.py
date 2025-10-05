@@ -63,8 +63,22 @@ class EdgeCaseTester:
         try:
             headers = {"Authorization": f"Bearer {self.admin_token}"}
             
-            # First, try to pause the regular user
-            response = self.session.post(f"{self.api_url}/admin/users/2/pause", headers=headers)
+            # First, get the list of users to find the regular user ID
+            users_response = self.session.get(f"{self.api_url}/admin/users", headers=headers)
+            if users_response.status_code != 200:
+                print(f"❌ Failed to get users list: {users_response.status_code}")
+                return False
+                
+            users = users_response.json()
+            regular_user = next((user for user in users if user['email'] == 'user@lumaa.ai'), None)
+            if not regular_user:
+                print("❌ Regular user not found in users list")
+                return False
+                
+            user_id = regular_user['id']
+            
+            # Now try to pause the regular user
+            response = self.session.post(f"{self.api_url}/admin/users/{user_id}/pause", headers=headers)
             
             if response.status_code == 200:
                 print("✅ User paused successfully")
