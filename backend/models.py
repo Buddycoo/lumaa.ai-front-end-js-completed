@@ -56,6 +56,11 @@ class User(BaseModel):
     minutes_used: int = 0
     minutes_allocated: int = 1000
     revenue_generated: float = 0.0
+    # Payment & Billing fields
+    credits_balance: float = 0.0  # 1 credit = 1 AED
+    monthly_plan_cost: float = 100.0  # AED per month
+    next_billing_date: datetime
+    payment_status: PaymentStatus = PaymentStatus.PAID
     is_active: bool = True
     created_at: datetime
     updated_at: datetime
