@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useAuthStore } from '../store/authStore';
+import NotificationBell from './NotificationBell';
 import {
   LayoutDashboard,
   BarChart3,
