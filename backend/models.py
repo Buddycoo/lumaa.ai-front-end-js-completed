@@ -251,6 +251,14 @@ class AdminCallLogResponse(CallLogResponse):
     user_name: str
     revenue_generated: Optional[float] = None
 
+class TopUserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    revenue: float
+    minutes_used: int
+    category: str
+
 class AdminOverviewResponse(BaseModel):
     total_revenue: float
     total_minutes_used: int
