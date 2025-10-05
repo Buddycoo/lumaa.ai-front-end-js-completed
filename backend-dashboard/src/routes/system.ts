@@ -122,33 +122,4 @@ router.post('/bot-settings', authenticateToken, validateRequest(botSettingsSchem
   }
 });
 
-// POST /api/system/bot-toggle
-router.post('/bot-toggle', authenticateToken, async (req, res, next) => {
-  try {
-    const userId = req.user!.id;
-    
-    let botSettings = await prisma.botSetting.findFirst({
-      where: { userId }
-    });
-    
-    if (!botSettings) {
-      botSettings = await prisma.botSetting.create({
-        data: { userId }
-      });
-    }
-    
-    const updatedSettings = await prisma.botSetting.update({
-      where: { id: botSettings.id },
-      data: { isActive: !botSettings.isActive }
-    });
-    
-    res.json({
-      isActive: updatedSettings.isActive,
-      message: `Bot ${updatedSettings.isActive ? 'activated' : 'deactivated'} successfully`
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 export default router;

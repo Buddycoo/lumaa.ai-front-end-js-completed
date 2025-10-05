@@ -163,35 +163,4 @@ router.get('/call-logs', authenticateToken, async (req: AuthRequest, res, next) 
   }
 });
 
-// GET /api/dashboard/call-logs/:id
-router.get('/call-logs/:id', authenticateToken, async (req: AuthRequest, res, next) => {
-  try {
-    const user = req.user!;
-    const { id } = req.params;
-    const isAdmin = ['ADMIN', 'SUPERADMIN'].includes(user.role);
-    
-    const where: any = { id };
-    if (!isAdmin) {
-      where.userId = user.id;
-    }
-    
-    const callLog = await prisma.callLog.findFirst({
-      where,
-      include: {
-        user: {
-          select: { name: true, email: true }
-        }
-      }
-    });
-    
-    if (!callLog) {
-      return res.status(404).json({ error: 'Call log not found' });
-    }
-    
-    res.json(callLog);
-  } catch (error) {
-    next(error);
-  }
-});
-
 export default router;
