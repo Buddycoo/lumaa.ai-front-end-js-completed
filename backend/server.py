@@ -55,29 +55,7 @@ async def create_status_check(input: StatusCheckCreate):
     _ = await db.status_checks.insert_one(status_obj.dict())
     return status_obj
 
-# Authentication routes
-@api_router.post("/auth/login", response_model=TokenResponse)
-async def login(credentials: UserLogin):
-    user = authenticate_user(credentials.email, credentials.password)
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials - use password: pass"
-        )
-    
-    access_token, refresh_token = generate_tokens(user)
-    
-    return TokenResponse(
-        user=UserResponse(
-            id=user["id"],
-            name=user["name"], 
-            email=user["email"],
-            role=user["role"]
-        ),
-        accessToken=access_token,
-        refreshToken=refresh_token
-    )
-
+# Legacy authentication routes (keeping for backward compatibility)
 @api_router.post("/auth/refresh")
 async def refresh_token(request: RefreshTokenRequest):
     # This is a simplified refresh - in production you'd verify the refresh token
@@ -85,15 +63,6 @@ async def refresh_token(request: RefreshTokenRequest):
     raise HTTPException(
         status_code=401,
         detail="Please login again"
-    )
-
-@api_router.get("/auth/me", response_model=UserResponse) 
-async def get_current_user(current_user: dict = Depends(verify_token)):
-    return UserResponse(
-        id=current_user["id"],
-        name=current_user["name"],
-        email=current_user["email"], 
-        role=current_user["role"]
     )
 
 @api_router.get("/status", response_model=List[StatusCheck])
