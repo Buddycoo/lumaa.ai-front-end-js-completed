@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import axios from 'axios';
 
 // Configure axios defaults  
-const API_BASE_URL = 'http://localhost:8002'; // Dashboard backend with auth
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API_URL = `${API_BASE_URL}/api`;
 
 axios.defaults.baseURL = API_URL;
