@@ -230,24 +230,34 @@ const LandingPage = () => {
       {/* About Section */}
       <section id="about" className="pad-xxlarge">
         <div className="dark-content-container">
-          <div className="text-center mb-60">
+          <AnimatedSection 
+            animationType="fade-up" 
+            sectionName="about"
+            className="text-center mb-60"
+          >
             <h2 className="display-large mb-6">{aboutData.title}</h2>
             <p className="body-large max-w-4xl mx-auto">{aboutData.description}</p>
-          </div>
+          </AnimatedSection>
           
           <div className="dark-grid">
             {aboutData.services.map((service, index) => {
               const IconComponent = iconMap[service.icon];
               return (
-                <Card key={index} className="bg-bg-secondary border-border-subtle p-40 text-center dark-transition dark-hover">
-                  <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-brand-hover rounded-lg flex items-center justify-center">
-                      <IconComponent className="h-8 w-8 text-brand-primary" />
+                <AnimatedSection
+                  key={index}
+                  animationType="fade-up"
+                  delay={index * 200}
+                >
+                  <Card className="bg-bg-secondary border-border-subtle p-40 text-center dark-transition dark-hover group cursor-pointer transform hover:scale-105 hover:shadow-xl hover:shadow-brand-primary/10">
+                    <div className="flex justify-center mb-6">
+                      <div className="w-16 h-16 bg-brand-hover rounded-lg flex items-center justify-center group-hover:bg-brand-primary/20 transition-all duration-300 group-hover:scale-110">
+                        <IconComponent className="h-8 w-8 text-brand-primary transition-all duration-300 group-hover:scale-110" />
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="heading-3 mb-4">{service.title}</h3>
-                  <p className="body-medium">{service.description}</p>
-                </Card>
+                    <h3 className="heading-3 mb-4 group-hover:text-brand-primary transition-colors duration-300">{service.title}</h3>
+                    <p className="body-medium">{service.description}</p>
+                  </Card>
+                </AnimatedSection>
               );
             })}
           </div>
