@@ -1114,7 +1114,7 @@ class PostgreSQLAPITester:
         }
 
 if __name__ == "__main__":
-    tester = ComprehensiveAPITester(BACKEND_URL)
+    tester = PostgreSQLAPITester(BACKEND_URL)
     summary = tester.run_all_tests()
     
     # Exit with error code if tests failed
