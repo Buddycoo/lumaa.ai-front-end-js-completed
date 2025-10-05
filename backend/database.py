@@ -531,20 +531,30 @@ async def initialize_demo_data(db_manager: DatabaseManager):
     # Check if admin exists
     admin = await db_manager.get_user_by_email("admin@lumaa.ai")
     if not admin:
-        admin_data = UserCreateRequest(
-            name="Admin User",
-            email="admin@lumaa.ai",
-            password="pass",
-            category=UserCategory.SALES,
-            pin_code="1234",
-            minutes_allocated=99999
-        )
-        admin_id = await db_manager.create_user(admin_data)
-        # Update to admin role
-        await db_manager.users.update_one(
-            {"id": admin_id},
-            {"$set": {"role": UserRole.ADMIN}}
-        )
+        from datetime import timedelta
+        next_month = datetime.now(timezone.utc) + timedelta(days=30)
+        
+        admin_doc = {
+            "id": db_manager._generate_id(),
+            "name": "Admin User",
+            "email": "admin@lumaa.ai",
+            "password": db_manager._hash_password("pass"),
+            "role": UserRole.ADMIN,
+            "category": UserCategory.SALES,
+            "pin_code": "1234",
+            "status": UserStatus.ACTIVE,
+            "minutes_used": 0,
+            "minutes_allocated": 99999,
+            "revenue_generated": 0.0,
+            "credits_balance": 1000.0,
+            "monthly_plan_cost": 0.0,  # Admin doesn't pay
+            "next_billing_date": next_month.isoformat(),
+            "payment_status": "paid",
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db_manager.users.insert_one(admin_doc)
     
     # Check if regular user exists
     user = await db_manager.get_user_by_email("user@lumaa.ai")
