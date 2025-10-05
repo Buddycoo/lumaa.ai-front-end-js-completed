@@ -122,18 +122,18 @@ const Overview = () => {
           />
           
           <StatsCard
-            title="Active Clients"
-            value={stats.activeClients.toString()}
+            title="Total Users"
+            value={adminStats.totalUsers.toString()}
             icon={Users}
             trend="+3 new this month"
             trendUp={true}
           />
           
           <StatsCard
-            title="Pickup Rate"
-            value={`${stats.pickupRate}%`}
-            icon={TrendingUp}
-            trend="+2.5% improvement"
+            title="Active Users"
+            value={adminStats.activeUsers.toString()}
+            icon={Activity}
+            trend="67% active rate"
             trendUp={true}
           />
         </div>
