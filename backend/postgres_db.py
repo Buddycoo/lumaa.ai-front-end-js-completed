@@ -650,6 +650,7 @@ class PostgreSQLManager:
             "category": user.category.value,
             "pin_code": user.pin_code,
             "status": user.status.value,
+            "pause_reason": user.pause_reason,
             "function": user.function,
             "sip_endpoint": user.sip_endpoint,
             "sip_endpoints": user.sip_endpoints,
