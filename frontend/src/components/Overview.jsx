@@ -15,25 +15,32 @@ import {
 
 const Overview = () => {
   const { user } = useAuthStore();
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
+  const isAdmin = user?.role === 'admin';
   
-  // Mock stats data
-  const stats = {
-    totalCalls: 1247,
-    totalRevenue: 15600,
-    activeClients: 8,
-    pickupRate: 89,
-    systemStatus: {
-      ai: true,
-      calls: true,
-      whatsapp: false
-    },
-    // User-specific stats
+  // Mock stats data based on refined requirements
+  const adminStats = {
+    totalRevenue: 15600,     // Admins see revenue
+    totalMinutes: 2456,
+    totalUsers: 12,
+    activeUsers: 8,
+    topUsersByRevenue: [
+      { name: 'John Smith', revenue: 4500 },
+      { name: 'Sarah Johnson', revenue: 3200 }
+    ],
+    topUsersByMinutes: [
+      { name: 'Mike Wilson', minutes: 456 },
+      { name: 'Lisa Brown', minutes: 389 }
+    ]
+  };
+  
+  // User stats - NO REVENUE anywhere
+  const userStats = {
     callsMade: 156,
-    revenue: 1890,
-    minutesUsed: 234.5,
-    minutesLeft: 765.5,
-    botActive: true
+    pickupRate: 89,          // Success rate percentage
+    minutesUsed: user?.minutes_used || 234,
+    minutesAllocated: user?.minutes_allocated || 1000,
+    category: user?.category || 'real_estate',
+    botStatus: user?.status || 'active'
   };
   
   const StatsCard = ({ title, value, icon: Icon, trend, trendUp, className = '' }) => {
