@@ -153,6 +153,94 @@ class PostgreSQLManager:
         finally:
             session.close()
 
+
+    # Password Management
+    async def change_password(self, user_id: str, current_password: str, new_password: str) -> bool:
+        """Change user password"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.id == user_id).first()
+            if not user:
+                return False
+            
+            # Verify current password (demo: any password = "pass")
+            if current_password != "pass":
+                return False
+            
+            # Hash and update new password
+            user.password = self._hash_password(new_password)
+            user.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            return True
+        finally:
+            session.close()
+    
+    def _generate_reset_code(self) -> str:
+        """Generate 6-digit verification code"""
+        return str(random.randint(100000, 999999))
+    
+    async def initiate_password_reset(self, email: str) -> Optional[str]:
+        """Generate and store password reset code"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.email == email).first()
+            if not user:
+                return None
+            
+            # Generate reset code
+            reset_code = self._generate_reset_code()
+            expiry = datetime.now(timezone.utc) + timedelta(minutes=15)
+            
+            # Store code
+            user.reset_token = reset_code
+            user.reset_token_expiry = expiry
+            user.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            
+            return reset_code
+        finally:
+            session.close()
+    
+    async def verify_reset_code(self, email: str, code: str) -> bool:
+        """Verify password reset code"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.email == email).first()
+            if not user or not user.reset_token or not user.reset_token_expiry:
+                return False
+            
+            # Check if code matches and not expired
+            if user.reset_token == code and user.reset_token_expiry > datetime.now(timezone.utc):
+                return True
+            
+            return False
+        finally:
+            session.close()
+    
+    async def reset_password(self, email: str, code: str, new_password: str) -> bool:
+        """Reset password with verification code"""
+        session = self.get_session()
+        try:
+            user = session.query(User).filter(User.email == email).first()
+            if not user or not user.reset_token or not user.reset_token_expiry:
+                return False
+            
+            # Verify code and expiry
+            if user.reset_token != code or user.reset_token_expiry < datetime.now(timezone.utc):
+                return False
+            
+            # Update password and clear reset token
+            user.password = self._hash_password(new_password)
+            user.reset_token = None
+            user.reset_token_expiry = None
+            user.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            
+            return True
+        finally:
+            session.close()
+
+
     # Lead Management
     async def create_lead(self, user_id: str, lead_data: dict) -> str:
         """Create a new lead"""
