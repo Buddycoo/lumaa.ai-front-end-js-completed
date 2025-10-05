@@ -5,6 +5,7 @@ import Overview from './Overview';
 import CallLogs from './CallLogs';
 import BotSettings from './BotSettings';
 import UserManagement from './UserManagement';
+import UserPayments from './UserPayments';
 import { useAuthStore } from '../store/authStore';
 
 const Dashboard = () => {
