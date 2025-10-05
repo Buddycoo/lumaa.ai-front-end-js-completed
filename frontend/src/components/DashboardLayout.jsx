@@ -11,7 +11,10 @@ import {
   FileText,
   Bot,
   Upload,
-  AlertTriangle
+  AlertTriangle,
+  Shield,
+  Bell,
+  User
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
