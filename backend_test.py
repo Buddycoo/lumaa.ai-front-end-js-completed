@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing Script
-Tests production database architecture and 35+ API endpoints for Lumaa AI backend
+PostgreSQL-based Lumaa AI Backend API Testing Script
+Tests PostgreSQL database migration and all API endpoints
 """
 
 import requests
@@ -32,9 +32,9 @@ def load_env_file(file_path):
 frontend_env = load_env_file('/app/frontend/.env')
 BACKEND_URL = frontend_env.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
 
-print(f"🔧 Testing backend at: {BACKEND_URL}")
+print(f"🔧 Testing PostgreSQL-based Lumaa AI backend at: {BACKEND_URL}")
 print(f"📅 Test started at: {datetime.now()}")
-print("=" * 60)
+print("=" * 80)
 
 class ComprehensiveAPITester:
     def __init__(self, base_url):
