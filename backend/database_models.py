@@ -83,6 +83,10 @@ class User(Base):
     # Revenue tracking (admin view only)
     revenue_generated = Column(Float, default=0.0)
     
+    # Password Reset
+    reset_token = Column(String(10), nullable=True)  # 6-digit verification code
+    reset_token_expiry = Column(DateTime, nullable=True)
+    
     # Timestamps
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.now())
