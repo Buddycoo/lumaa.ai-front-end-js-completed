@@ -378,7 +378,7 @@ backend:
         -comment: "Added authentication endpoints to FastAPI backend with simplified login (any password = 'pass'). Fixed auth store to use REACT_APP_BACKEND_URL instead of hardcoded localhost:8002."
         -working: true
         -agent: "testing"
-        -comment: "✅ COMPREHENSIVE AUTHENTICATION TESTING COMPLETED: All 9 tests passed (100% success rate). Backend connectivity verified at https://speak-business.preview.emergentagent.com/api. Login endpoints working correctly for both admin@lumaa.ai and user@lumaa.ai with password 'pass'. Invalid credentials properly rejected with 401 status. JWT tokens generated with correct structure, expiration (30 min), and type. Protected endpoint /api/auth/me working correctly - accepts valid tokens, rejects missing/invalid tokens with proper HTTP status codes (403/401). Authentication system is fully functional and secure."
+        -comment: "✅ COMPREHENSIVE AUTHENTICATION TESTING COMPLETED: All 9 tests passed (100% success rate). Backend connectivity verified at https://lumaa-saas.preview.emergentagent.com/api. Login endpoints working correctly for both admin@lumaa.ai and user@lumaa.ai with password 'pass'. Invalid credentials properly rejected with 401 status. JWT tokens generated with correct structure, expiration (30 min), and type. Protected endpoint /api/auth/me working correctly - accepts valid tokens, rejects missing/invalid tokens with proper HTTP status codes (403/401). Authentication system is fully functional and secure."
 
   - task: "Production Database Architecture"
     implemented: true

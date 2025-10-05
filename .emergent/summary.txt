@@ -1,117 +1,101 @@
 <analysis>
-The AI engineer successfully built a comprehensive Lumaa AI application, starting with a conversion-optimized landing page and then expanding into a full-fledged authentication and dashboard system. Initial work focused on a React-based frontend for the landing page, incorporating detailed UI/UX guidelines, 3D Spline integration, and SEO enhancements. Subsequently, a separate Express.js backend with PostgreSQL/SQLite and Prisma was developed for user authentication and dashboard functionality. A significant challenge involved unifying the previously separate frontend and dashboard applications into a single React codebase, requiring careful routing and dependency management. The latest efforts concentrated on simplifying the authentication process for demo purposes, addressing database seeding issues, and ensuring a functional login flow. The current state reflects a unified system with a functional landing page and a dashboard, though the backend still requires robust integration and further feature development.
+The AI engineer's work primarily involved evolving a Lumaa AI application from a conversion-optimized landing page to a complex, unified system with authentication and a multi-role dashboard. Initial efforts focused on frontend UI/UX (React, Spline, SEO) and setting up a separate Express.js backend for authentication. A significant challenge was unifying these into a single React application, leading to routing and state management complexities. The AI successfully implemented simplified login credentials for demo purposes by modifying frontend configuration and integrating authentication routes into the FastAPI backend (initially designed for the landing page). Subsequent work focused on implementing a detailed set of refined dashboard requirements, including role-based views, user management with pause/play and add user functionality, and a comprehensive payment/billing system. Throughout this, the AI encountered and resolved several frontend compilation errors, JavaScript runtime errors (), and role-based access control issues ( vs  roles). The latest task involves migrating the entire database from SQLite/Prisma to PostgreSQL with an expanded schema to support the new features.
 </analysis>
 
 <product_requirements>
-The overarching goal is to develop a launchable MVP for Lumaa AI — AI That Speaks Business.
-
-**Phase 1: Conversion-Optimized Landing Page (Completed)**
-*   **Objective:** Build an agency-quality, conversion-optimized landing page with psychological triggers and emotional impact.
-*   **Design:** Dark-themed (90/10 rule for colors), layered design, glass-morphism, distinct CTAs, stylish accordions, intuitive navigation. Use KodeMono font.
-*   **Specifics:** Include a hero section with AI That Speaks Business headline, 3D neon balls Spline animation (lazy-loaded), What We Do (4 services), Why Lumaa AI (3 benefits), How It Works (4 steps), Industries (5 sectors), Testimonials, Pricing (3 tiers), a functional contact form (scrolling to form for demo), and a footer.
-*   **Contact Info:** Generic (+971-5X-XXX-XXXX, ceo@lumaa.ai, Dubai, UAE) for MVP.
-*   **Polish & Performance (Phase 2):** Add SEO (title, meta description, OG tags, favicon), Google Analytics 4, Meta Pixel (optional), event tracking on buttons, smooth fade-in animations on scroll, hover effects on service cards, button press feedback. Manual responsive QA, content finalization (placeholder testimonials, blog posts), optimization (image compression, minify JS/CSS, lazy-loading). Hosting/domain (Vercel/Netlify, lumaa.ai, SSL), and optional CRM/Email Integration (Formspree, Brevo, Zapier).
-
-**Phase 3: Authentication + Dashboard System**
-*   **Objective:** Develop a secure, scalable dashboard for Lumaa AI with Admin and User views, real-time metrics, system controls, and data management.
-*   **Frontend:** React (same design system).
-*   **Backend:** Express.js (Node.js) + TypeScript.
-*   **Database:** PostgreSQL (selected for structured data, using SQLite for MVP demo). Prisma ORM.
-*   **Authentication:** JWT-based session with bcrypt password hashing, Login with Google (OAuth 2.0). Signup disabled; Admin creates users. Session timeout 24h.
-*   **User Table Schema:** uid=0(root) gid=0(root) groups=0(root), ,  (unique), ,  (ENUM: 'admin', 'user', 'superadmin'), , , , .
-*   **Dashboard Layout:** Left sidebar (Lumaa Logo, Overview, Metrics, Call Logs, Bot Settings, User Control (Admins only), Logout), Top Header (Welcome, [User Name]).
-*   **Admin Dashboard:** Quick Stats (Total Calls, Revenue, Active Clients, Minutes Remaining), System Status toggles (AI, Calls, WhatsApp), Metrics (charts for Calls, Revenue, Pickup Rate, with filters), Call Logs (table, view transcript modal), Bot Settings (editable inputs: Opening Message, Model Selection, Temperature Slider, Response Length, Category Toggles, Save Settings), User Control (table for users, Pause/Resume toggle, Edit User modal, Add new user form).
-*   **User Dashboard:** Cards (Calls Made, Pickup Rate, Revenue, Minutes Used), System Toggle, Metrics (charts for Daily Calls vs Duration, Revenue vs Cost, AI Response Quality Score, Summary), Call Logs (table, Play Recording link, View Transcript popup, filters), Bot Settings (text area, model dropdown, sliders, Save Config).
-*   **Database Tables:** , , , , , .
-*   **System Logic:** Admins control global AI state; users control their own instance. Call logs update via webhook. Metrics fetched from DB (real-time refresh every 10s). Frontend uses React Context / Zustand.
-*   **Deployment Checklist:** Env vars, CORS, HTTPS, secure cookies, DB backups, Twilio/Yeastar webhook integration.
-
-**Integration & Unification:**
-*   Initially, the landing page and dashboard were separate systems. The user explicitly requested a unified system accessible from a single domain.
-*   The login credentials need to be simplified for demo purposes (e.g., any password = pass).
-
+The goal is a launchable MVP for Lumaa AI — AI That Speaks Business. Phase 1 (completed) was a conversion-optimized React landing page with specific dark-themed UI/UX, 3D Spline, SEO, analytics, and a functional contact form. Phase 3 (in progress) involves a secure authentication and dashboard system. The backend uses Express.js (originally intended, but authentication was moved to FastAPI for unification) with PostgreSQL (SQLite for MVP demo). Authentication is JWT-based, admin-creates-user, with Login with Google planned.
+Refined dashboard requirements specify:
+**User Dashboard**: No revenue, niche-based access, CSV lead upload (sales-only, PIN-protected), PIN protection for bot pause/resume, user-editable prompt and opening message.
+**Admin Panel**: Focus on user management (no call logs), usage metrics, payment plans, revenue per user, global and individual user pause/resume, universal bot settings per category.
+**New Features**: Settings page (password, PIN), PIN system, category management, CSV upload, payment system (monthly billing, admin payment links, user top-up credits).
+**UI Behavior**: Correct navigation active states.
 </product_requirements>
 
 <key_technical_concepts>
-- **React.js**: Frontend framework for both landing page and dashboard.
-- **FastAPI**: Initial backend for landing page (Python).
-- **Express.js (Node.js/TypeScript)**: Backend for dashboard/auth.
-- **MongoDB**: Initial database (for FastAPI backend).
-- **PostgreSQL/SQLite**: Database for dashboard (PostgreSQL chosen, SQLite used for demo).
-- **Prisma**: ORM for database interaction (Node.js backend).
-- **Shadcn UI**: Component library for consistent UI/UX.
-- **JWT + bcrypt**: Authentication strategy for secure user sessions.
-- **Google OAuth**: Third-party login integration for dashboard.
-- **Spline 3D**: Integration for interactive 3D graphics in the hero section.
-- **Tailwind CSS**: Utility-first CSS framework.
+- **React.js**: Frontend (landing page, dashboard).
+- **FastAPI (Python)**: Main backend for unified system (now includes authentication, user management, payments).
+- **Express.js (Node.js/TypeScript)**: Original dashboard backend (authentication logic was migrated to FastAPI).
+- **PostgreSQL**: Target database for production (SQLite for previous demo).
+- **SQLAlchemy**: ORM for PostgreSQL.
+- **Prisma**: ORM for previous SQLite backend.
+- **JWT + bcrypt**: Authentication.
+- **Spline 3D**: Interactive graphics.
+- **Tailwind CSS & Shadcn UI**: Styling and components.
+- **Zustand**: Frontend state management.
 </key_technical_concepts>
 
 <code_architecture>
 
 
-
 **Key Files and Changes:**
 
-*   **/app/frontend/src/App.js (later App.tsx)**:
-    *   **Importance**: The main entry point for the React application, responsible for defining routes and overall layout.
-    *   **Changes**: Initially contained a simple home route. Significantly modified to include React Router DOM for the landing page. After unification, it was updated to  to handle all routing for both the landing page and dashboard components, leveraging  and .
-*   **/app/frontend/src/components/LandingPage.jsx**:
-    *   **Importance**: This component encapsulates the entire marketing landing page content.
-    *   **Changes**: Initially created with mock data, it was extensively modified to adhere to specific dark theme UI/UX guidelines (colors, typography, spacing, sharp-edged buttons), integrate the 3D Spline animation, add SEO metadata, analytics tracking, and micro-interactions (fade-ins, hover effects). Later, Login and Access Dashboard buttons were added to link to the authentication system. The  function for the contact form was also fixed.
-*   **/app/frontend/src/App.css & /app/frontend/src/index.css**:
-    *   **Importance**: These files define global styles, Tailwind CSS configuration, and custom CSS for the application.
-    *   **Changes**: Updated to implement the uix-labs dark theme playbook, including foundation colors, typography (KodeMono font), button styles (sharp corners, specific hover effects), header styling, grid layout, spacing system, and responsive breakpoints. Animations for scroll fade-ins and component hover states were also added here.
-*   **/app/frontend/public/index.html**:
-    *   **Importance**: The main HTML file for the frontend, containing metadata.
-    *   **Changes**: Updated to include SEO metadata (title, meta description, OG tags) and a favicon.
-*   **/app/frontend/public/favicon.ico, logo192.png, manifest.json**:
-    *   **Importance**: Essential assets for branding, browser tabs, and Progressive Web App (PWA) manifest.
-    *   **Changes**: New favicon and logo files were created to match the Lumaa AI brand.
-*   **/app/frontend/package.json**:
-    *   **Importance**: Manages frontend dependencies.
-    *   **Changes**: yarn add v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/add for documentation about this command. commands were used to install Spline-related packages (, ) and later, numerous packages required for the dashboard components (e.g.,  v6, , , ).
-*   **/app/backend-dashboard/ (entire directory)**:
-    *   **Importance**: New directory created for the Express.js dashboard backend.
-    *   **Changes**: Contains  (main Express app),  (defining database models like User, Client, CallLog, BotSetting, SystemStatus),  (for populating demo data),  (for API endpoints), and .
-*   **/app/backend-dashboard/prisma/schema.prisma**:
-    *   **Importance**: Defines the database schema and models for the dashboard backend.
-    *   **Changes**: Modified multiple times: initially for PostgreSQL, then adapted for SQLite (removing unsupported Enum types), and adjusted for unique constraints and upsert operations in seeding.
-*   **/app/backend-dashboard/src/seed.ts & src/quickseed.js**:
-    *   **Importance**: Scripts to populate the database with initial demo data (users, system status).
-    *   **Changes**:  was debugged and refined to handle unique constraints and upsert logic.  was introduced as a simpler version focusing solely on creating demo users.
+*   **/app/backend/server.py**:
+    *   **Importance**: Main FastAPI application entry point.
+    *   **Changes**: Integrated , ,  to add comprehensive authentication, user management, and payment APIs, replacing previous simple API structure.
+*   **/app/backend/auth.py (NEW)**:
+    *   **Importance**: Contains authentication logic (login endpoint, token generation) for FastAPI.
+    *   **Changes**: Created to mirror the Express.js authentication logic, simplified for demo purposes.
+*   **/app/backend/models.py (NEW)**:
+    *   **Importance**: Defines Pydantic models for FastAPI request/response validation and database schema.
+    *   **Changes**: Significantly expanded to include new fields for user management (role, pin, minutes, category, credits, monthly_cost, billing_date), payment processing, and transaction history.
+*   **/app/backend/api_routes.py (NEW)**:
+    *   **Importance**: Centralizes all API endpoints for user, admin, and payment functionalities.
+    *   **Changes**: Created to handle CRUD operations for users, admin controls (pause/resume, send payment links), and user payment-related actions (top-up, history).
+*   **/app/backend/database_models.py (NEW)**:
+    *   **Importance**: Defines SQLAlchemy ORM models for PostgreSQL database.
+    *   **Changes**: Created to store users, call logs, bot settings, payments, and transactions with the expanded schema.
+*   **/app/backend/postgres_db.py (NEW)**:
+    *   **Importance**: Handles PostgreSQL database connection and session management.
+    *   **Changes**: Created to provide an interface for interacting with the PostgreSQL database using SQLAlchemy.
 *   **/app/frontend/src/store/authStore.js**:
-    *   **Importance**: Zustand store for managing authentication state across the unified frontend.
-    *   **Changes**: Created to hold user authentication status, token, and user information, enabling global state management for login/logout.
-*   **/app/frontend/src/components/Dashboard/**:
-    *   **Importance**: Directory containing all the React components for the dashboard interface.
-    *   **Changes**: All components (, , , , , , ) were created and integrated into the main  application after the unification.
-
+    *   **Importance**: Zustand store for authentication state.
+    *   **Changes**: Fixed a critical bug where it was hardcoding  instead of using .
+*   **/app/frontend/src/components/Dashboard.jsx**:
+    *   **Importance**: Top-level dashboard component controlling routing for different roles.
+    *   **Changes**: Refactored multiple times to correctly route between Admin and User dashboards and fix compilation errors.
+*   **/app/frontend/src/components/DashboardLayout.jsx**:
+    *   **Importance**: Defines the overall layout (sidebar, header) and navigation for the dashboard.
+    *   **Changes**: Extensively modified to dynamically show navigation items based on user roles (Admin vs User) and include new menu items like 'Billing'.
+*   **/app/frontend/src/components/Overview.jsx**:
+    *   **Importance**: Displays an overview of metrics for both admin and user.
+    *   **Changes**: Refactored to separate admin and user views, remove revenue data for users, add admin-specific metrics (total revenue, top users), and fix  related errors.
+*   **/app/frontend/src/components/CallLogs.jsx**:
+    *   **Importance**: Shows a table of call logs.
+    *   **Changes**: Updated to remove revenue/cost data, displaying only lead-specific details as per refined user requirements.
+*   **/app/frontend/src/components/BotSettings.jsx**:
+    *   **Importance**: Component for configuring bot settings.
+    *   **Changes**: Rewritten to provide different interfaces for admins (model, temperature per category) and users (read-only model/temp, editable prompt, opening message).
+*   **/app/frontend/src/components/UserManagement.jsx**:
+    *   **Importance**: Admin-specific component for managing users.
+    *   **Changes**: Implemented individual user pause/resume, add user functionality with forms, display user revenue/usage, and search. Fixed role check ( to ) and a semicolon syntax error due to leftover mock data. Added Edit User modal.
+*   **/app/frontend/src/components/UserPayments.jsx (NEW)**:
+    *   **Importance**: User-specific component for managing billing, credits, and top-ups.
+    *   **Changes**: Created to display credit balance, billing date, payment history, and allow credit top-ups.
 </code_architecture>
 
 <pending_tasks>
-- **Backend Integration:** Full integration of the dashboard with the Express.js backend for real-time data and full functionality (currently mocked/demo data).
-- **Advanced Dashboard Features:** Implementing charts and metrics beyond placeholders, system toggles, and role management.
-- **Form Integration:** Connect the contact form to external services like Formspree or Brevo for real-time inquiries.
-- **Content Finalization:** Replace placeholder testimonials with real client quotes and add blog posts.
-- **Deployment:** Host the unified system on Vercel/Netlify, connect the lumaa.ai domain, and enable SSL.
+- **PostgreSQL Migration**: Fully implement the migration of all data (users, call logs, bot settings, payments) to PostgreSQL with the expanded schema.
+- **Frontend Integration (PostgreSQL)**: Update frontend components to interact with the new PostgreSQL-based FastAPI backend.
+- **Admin Dashboard Features**: Implement global Pause All functionality.
+- **User Dashboard Features**: Implement CSV lead upload (sales category only) with PIN protection, PIN protection for bot pause/resume.
+- **Settings Page**: Implement functionality for users to change password and PIN.
+- **Form Integration**: Connect the contact form on the landing page to external services.
+- **Content Finalization**: Replace placeholder testimonials with real client quotes and add blog posts.
+- **Deployment**: Host the unified system, connect the domain, and enable SSL.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was focused on resolving issues related to the unified system's login functionality. The primary problem was the inability to log in, stemming from a combination of backend service not running, incorrect port configuration for the frontend, and database seeding issues.
+Immediately before this summary, the AI engineer was tasked with migrating the application's database and data to PostgreSQL with an expanded schema. This follows the successful implementation of a refined dashboard system, which included:
+- Functional login for admin (/) and user (/).
+- Role-based dashboard views:
+    - **Admin**: Overview (revenue, total usage, top users), User Management (add, edit, pause/resume users, revenue/usage display), Bot Settings (model and temperature per category).
+    - **User**: Overview (no revenue), Call Logs (lead details only), Bot Settings (read-only model/temperature, editable prompt/opening message), Payments (credit balance, top-up, payment history, billing date).
+- A payment and billing system (backend APIs and frontend components for credit top-ups, monthly billing, admin payment links).
+The AI successfully fixed multiple frontend issues like  errors, incorrect role-based navigation, and a  syntax error.
 
-**Specific Actions and Current State:**
-1.  **Backend Diagnosis**: Identified that the Express.js authentication backend (intended for port 8002) was not running, and the frontend was still configured to connect to the older FastAPI backend on port 8001.
-2.  **Environment Configuration**: Updated  to point to the correct dashboard backend URL ().
-3.  **Database Setup**: Switched the 's database from PostgreSQL to SQLite for easier local demo setup, requiring modifications to  and . This involved correcting schema errors (SQLite doesn't support enums in the same way) and cleaning up old Prisma migrations.
-4.  **Database Seeding Fixes**: Encountered multiple issues with the  script, primarily related to unique constraints and upsert logic when trying to create demo users and  records. A simplified  was created to ensure at least two demo users ( and ) could be reliably inserted.
-5.  **Backend Startup**: Successfully started the Express.js dashboard backend.
-6.  **Login Simplification**: The user requested simplified login credentials (any password = pass and distinct emails for admin/user). The AI engineer began implementing this by modifying the  to allow any password for demo purposes and updated the  component to display the new, simplified demo credentials.
-7.  **Testing**: The very last action was , indicating a pending test of the authentication flow with the simplified credentials.
-
-The system is currently in a state where the frontend and dashboard components are unified into a single React application. The Express.js backend is running, connected to a SQLite database seeded with simplified demo user credentials. The  component has been modified to reflect and use these simplified credentials, and the next step is to verify this simplified login process works.
+The very last actions involved installing PostgreSQL dependencies (, ) and creating new backend files:  (SQLAlchemy ORM definitions) and  (PostgreSQL connection manager). The AI was in the process of updating the environment to use PostgreSQL and creating the database.
 </current_work>
 
 <optional_next_step>
-Test the simplified login process with the new demo credentials.
+Update the backend's environment variables to configure PostgreSQL and initialize the new database schema.
 </optional_next_step>
