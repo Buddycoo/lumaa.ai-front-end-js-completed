@@ -312,15 +312,6 @@ class LeadCreateRequest(BaseModel):
     company: Optional[str] = None
     notes: Optional[str] = None
 
-class TopUserResponse(BaseModel):
-    id: str
-    name: str
-    email: str
-    revenue: float
-    minutes_used: int
-    category: str
-
-
 class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
