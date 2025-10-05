@@ -12,25 +12,136 @@ import { toast } from 'sonner';
 import axios from 'axios';
 
 const BotSettings = () => {
-  const [settings, setSettings] = useState({
-    openingMessage: "Hello! I'm your AI assistant from Lumaa AI. How can I help you today?",
-    prompt: "You are a professional AI assistant. Be helpful, courteous, and provide accurate information to assist customers effectively.",
-    // Read-only settings controlled by admin
-    model: 'GPT-4',
-    temperature: 0.7,
-    category: 'real_estate'
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
+  
+  // User settings state
+  const [userSettings, setUserSettings] = useState({
+    opening_message: '',
+    prompt: '',
+    // Read-only for users
+    model: '',
+    temperature: 0.7
   });
   
-  const [isLoading, setIsLoading] = useState(false);
+  // Admin settings state (per category)
+  const [adminSettings, setAdminSettings] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState('real_estate');
   
-  const handleSave = async () => {
-    setIsLoading(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const categories = [
+    { value: 'real_estate', label: 'Real Estate' },
+    { value: 'hospitality', label: 'Hospitality' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'healthcare', label: 'Healthcare' },
+    { value: 'automotive', label: 'Automotive' }
+  ];
+
+  const models = [
+    { value: 'gpt-4', label: 'GPT-4' },
+    { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+    { value: 'claude-3', label: 'Claude 3' }
+  ];
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchAdminBotSettings();
+    } else {
+      fetchUserBotSettings();
+    }
+  }, [isAdmin]);
+
+  const fetchUserBotSettings = async () => {
+    try {
+      const response = await axios.get('/user/bot-settings');
+      setUserSettings(response.data);
+    } catch (error) {
+      toast.error('Failed to load bot settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAdminBotSettings = async () => {
+    try {
+      // Load settings for the first category
+      const response = await axios.get(`/admin/bot-settings/${selectedCategory}`);
+      setAdminSettings({
+        ...adminSettings,
+        [selectedCategory]: response.data
+      });
+    } catch (error) {
+      // If no settings exist, set defaults
+      setAdminSettings({
+        ...adminSettings,
+        [selectedCategory]: {
+          model: 'gpt-4',
+          temperature: 0.7,
+          opening_message: `Hello! I'm an AI assistant specialized in ${selectedCategory.replace('_', ' ')}. How can I help you today?`,
+          prompt: `You are a professional AI assistant for ${selectedCategory.replace('_', ' ')}. Be helpful, knowledgeable, and maintain a professional tone.`
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCategoryChange = async (category) => {
+    setSelectedCategory(category);
     
-    // Mock save operation
-    setTimeout(() => {
-      toast.success('Bot settings saved successfully!');
-      setIsLoading(false);
-    }, 1000);
+    if (!adminSettings[category]) {
+      try {
+        const response = await axios.get(`/admin/bot-settings/${category}`);
+        setAdminSettings({
+          ...adminSettings,
+          [category]: response.data
+        });
+      } catch (error) {
+        // Set defaults if no settings exist
+        setAdminSettings({
+          ...adminSettings,
+          [category]: {
+            model: 'gpt-4',
+            temperature: 0.7,
+            opening_message: `Hello! I'm an AI assistant specialized in ${category.replace('_', ' ')}. How can I help you today?`,
+            prompt: `You are a professional AI assistant for ${category.replace('_', ' ')}. Be helpful, knowledgeable, and maintain a professional tone.`
+          }
+        });
+      }
+    }
+  };
+
+  const handleSaveUserSettings = async () => {
+    setSaving(true);
+    try {
+      await axios.put('/user/bot-settings', {
+        opening_message: userSettings.opening_message,
+        prompt: userSettings.prompt
+      });
+      toast.success('Bot settings saved successfully');
+    } catch (error) {
+      toast.error('Failed to save bot settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveAdminSettings = async () => {
+    setSaving(true);
+    try {
+      const currentSettings = adminSettings[selectedCategory];
+      await axios.put(`/admin/bot-settings/${selectedCategory}`, {
+        model: currentSettings.model,
+        temperature: currentSettings.temperature
+      });
+      toast.success(`Bot settings saved for ${categories.find(c => c.value === selectedCategory)?.label}`);
+    } catch (error) {
+      toast.error('Failed to save bot settings');
+    } finally {
+      setSaving(false);
+    }
   };
   
   return (
