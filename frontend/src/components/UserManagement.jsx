@@ -273,10 +273,10 @@ const UserManagement = () => {
                 Add User
               </Button>
             </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-800">
-            <DialogHeader>
-              <DialogTitle className="text-white">Add New User</DialogTitle>
-            </DialogHeader>
+            <DialogContent className="bg-gray-900 border-gray-800">
+              <DialogHeader>
+                <DialogTitle className="text-white">Add New User</DialogTitle>
+              </DialogHeader>
             <form onSubmit={handleAddUser} className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-gray-300">Full Name</Label>
