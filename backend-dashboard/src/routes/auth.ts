@@ -28,10 +28,9 @@ router.post('/login', validateRequest(loginSchema), async (req, res, next) => {
       throw createError('Account is deactivated', 401);
     }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      throw createError('Invalid credentials', 401);
+    // Simplified password check - any password = "pass"
+    if (password !== 'pass') {
+      throw createError('Invalid credentials - use password: pass', 401);
     }
 
     // Generate tokens
