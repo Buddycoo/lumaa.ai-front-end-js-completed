@@ -618,9 +618,9 @@ class PostgreSQLAPITester:
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get('success') and data.get('leads_imported', 0) > 0:
+                if data.get('lead_ids') and len(data.get('lead_ids', [])) > 0:
                     self.log_test("CSV Upload (Sales User)", True, 
-                                f"CSV upload successful: {data.get('leads_imported')} leads imported",
+                                f"CSV upload successful: {len(data.get('lead_ids'))} leads imported",
                                 f"Message: {data.get('message')}")
                     return True
                 else:
