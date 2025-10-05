@@ -23,6 +23,15 @@ const UserManagement = () => {
   const [editUserModal, setEditUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
+  // Pause modal states
+  const [pauseModal, setPauseModal] = useState(false);
+  const [pauseAllModal, setPauseAllModal] = useState(false);
+  const [userToPause, setUserToPause] = useState(null);
+  const [pauseData, setPauseData] = useState({
+    reason: '',
+    admin_pin: ''
+  });
+  
   // New user form state
   const [newUser, setNewUser] = useState({
     name: '',
