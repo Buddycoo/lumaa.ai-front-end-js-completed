@@ -445,6 +445,8 @@ class PostgreSQLManager:
             "status": user.status.value,
             "function": user.function,
             "sip_endpoint": user.sip_endpoint,
+            "sip_endpoints": user.sip_endpoints,
+            "concurrency": user.concurrency,
             "prompt": user.prompt,
             "min_subscribed": user.min_subscribed,
             "min_used": user.min_used,
