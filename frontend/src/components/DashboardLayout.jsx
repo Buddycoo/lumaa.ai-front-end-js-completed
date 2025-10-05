@@ -1,53 +1,111 @@
-import React from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, NavLink, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useAuthStore } from '../store/authStore';
 import {
   LayoutDashboard,
-  BarChart3,
   Phone,
   Settings,
   Users,
   LogOut,
-  Shield,
-  Activity,
-  Bell,
-  User
+  FileText,
+  Bot,
+  Upload,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [systemStatus, setSystemStatus] = useState(null);
   
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
+  const isAdmin = user?.role === 'admin';
+  
+  useEffect(() => {
+    fetchSystemStatus();
+  }, []);
+
+  const fetchSystemStatus = async () => {
+    try {
+      const response = await axios.get('/system/status');
+      setSystemStatus(response.data);
+    } catch (error) {
+      console.error('Failed to fetch system status:', error);
+    }
+  };
   
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
     navigate('/');
   };
+
+  // Check if user is blocked
+  if (user?.status === 'blocked') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center max-w-md p-8">
+          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-2">Account Blocked</h1>
+          <p className="text-gray-400 mb-6">You have been blocked by the admin. Please contact support.</p>
+          <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700">
+            Return to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
-  const menuItems = [
+  const adminMenuItems = [
     {
       icon: LayoutDashboard,
       label: 'Overview',
-      href: '/dashboard',
-      adminOnly: false
+      href: '/dashboard'
+    },
+    {
+      icon: Users,
+      label: 'User Management',
+      href: '/dashboard/users'
+    },
+    {
+      icon: Settings,
+      label: 'Settings',
+      href: '/dashboard/settings'
+    }
+  ];
+
+  const userMenuItems = [
+    {
+      icon: LayoutDashboard,
+      label: 'Overview',
+      href: '/dashboard'
     },
     {
       icon: Phone,
       label: 'Call Logs',
-      href: '/dashboard/calls',
-      adminOnly: false
+      href: '/dashboard/calls'
     },
+    {
+      icon: Bot,
+      label: 'Bot Settings',
+      href: '/dashboard/bot-settings'
+    },
+    ...(user?.category === 'sales' ? [{
+      icon: Upload,
+      label: 'Upload Leads',
+      href: '/dashboard/leads'
+    }] : []),
     {
       icon: Settings,
-      label: 'Bot Settings',
-      href: '/dashboard/settings',
-      adminOnly: false
-    },
-    {
+      label: 'Settings',
+      href: '/dashboard/settings'
+    }
+  ];
+  
+  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
       icon: Users,
       label: 'User Control',
       href: '/dashboard/users',
