@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const AdminDashboard = () => {
+const AdminOverview = () => {
   const { user } = useAuthStore();
   const [overview, setOverview] = useState(null);
   const [users, setUsers] = useState([]);
