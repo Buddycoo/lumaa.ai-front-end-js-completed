@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { 
   Phone, 
   Headphones, 
@@ -19,6 +19,7 @@ import {
   Globe, 
   ChevronDown
 } from 'lucide-react';
+import Spline from '@splinetool/react-spline';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
