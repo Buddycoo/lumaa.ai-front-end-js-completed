@@ -160,6 +160,14 @@ const DashboardLayout = ({ children }) => {
             </h2>
             <span className="text-gray-400">•</span>
             <span className="text-sm text-gray-400">Welcome, {user?.name}</span>
+            {user?.category && !isAdmin && (
+              <>
+                <span className="text-gray-400">•</span>
+                <span className="text-sm text-[#00FFD1] capitalize">
+                  {user.category.replace('_', ' ')} Category
+                </span>
+              </>
+            )}
           </div>
           
           <div className="flex items-center gap-3">
