@@ -144,6 +144,8 @@ const LandingPage = () => {
         <div className="flex items-center">
           <h2 className="text-2xl font-bold text-brand-primary">Lumaa AI</h2>
         </div>
+        
+        {/* Desktop Navigation */}
         <nav className="dark-nav hidden md:flex">
           <button 
             onClick={() => scrollToSection('about')} 
@@ -176,6 +178,19 @@ const LandingPage = () => {
             Contact
           </button>
         </nav>
+        
+        {/* Mobile CTA Button */}
+        <div className="md:hidden">
+          <Button 
+            className="btn-primary text-sm px-4 py-2 min-h-10"
+            onClick={() => {
+              trackButtonClick('Get Demo', 'Mobile Header');
+              scrollToSection('contact');
+            }}
+          >
+            Get Demo
+          </Button>
+        </div>
       </header>
 
       {/* Hero Section */}
