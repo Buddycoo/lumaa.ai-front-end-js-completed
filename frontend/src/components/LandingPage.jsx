@@ -24,6 +24,14 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import AnimatedSection from './AnimatedSection';
+import { 
+  trackButtonClick, 
+  trackDemo, 
+  trackFormSubmission,
+  trackPixelLead 
+} from '../hooks/useAnalytics';
+import { submitFormWithFallbacks, getFormConfig } from '../utils/formIntegration';
 import { 
   heroData, 
   aboutData, 
