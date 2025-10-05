@@ -249,72 +249,108 @@ const UserManagement = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Users className="h-5 w-5 text-[#00FFD1]" />
-            Active Users ({users.length})
+            Users ({filteredUsers.length})
           </CardTitle>
           <CardDescription className="text-gray-400">
             Manage user accounts, permissions, and usage limits
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {users.map((userData) => (
-              <div key={userData.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#00FFD1] rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-black">
-                      {userData.name.charAt(0)}
-                    </span>
+          {filteredUsers.length > 0 ? (
+            <div className="space-y-4">
+              {filteredUsers.map((userData) => (
+                <div key={userData.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#00FFD1] rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-black">
+                        {userData.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{userData.name}</p>
+                      <p className="text-sm text-gray-400">{userData.email}</p>
+                      <p className="text-xs text-gray-500 capitalize">
+                        {categories.find(c => c.value === userData.category)?.label || userData.category}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-medium">{userData.name}</p>
-                    <p className="text-sm text-gray-400">{userData.email}</p>
-                    <p className="text-xs text-gray-500">Last active: {userData.lastActive}</p>
+                  
+                  <div className="flex items-center gap-6">
+                    <div className="text-center">
+                      <Badge className={`${
+                        userData.status === 'active' ? 'bg-green-600' : 
+                        userData.status === 'paused' ? 'bg-yellow-600' : 'bg-red-600'
+                      } text-white`}>
+                        {userData.status.toUpperCase()}
+                      </Badge>
+                    </div>
+                    
+                    <div className="text-center min-w-[120px]">
+                      <div className="flex items-center gap-2 text-[#00FFD1]">
+                        <DollarSign className="h-4 w-4" />
+                        <span className="text-sm font-medium">
+                          ${userData.revenue_generated?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">Revenue</p>
+                    </div>
+                    
+                    <div className="text-center min-w-[100px]">
+                      <div className="flex items-center gap-2 text-white">
+                        <Clock className="h-4 w-4" />
+                        <span className="text-sm">
+                          {userData.minutes_used} / {userData.minutes_allocated}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">Minutes</p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={userData.status === 'active' ? 'destructive' : 'default'}
+                        onClick={() => handleToggleUserStatus(userData.id, userData.status)}
+                        className={userData.status === 'active' 
+                          ? 'bg-red-600 hover:bg-red-700' 
+                          : 'bg-[#00FFD1] text-black hover:bg-[#00FFD1]/90'
+                        }
+                      >
+                        {userData.status === 'active' ? (
+                          <>
+                            <Pause className="h-3 w-3 mr-1" />
+                            Pause
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-3 w-3 mr-1" />
+                            Resume
+                          </>
+                        )}
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedUser(userData);
+                          setEditUserModal(true);
+                        }}
+                        className="border-gray-700 text-gray-300 hover:bg-gray-700"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      userData.role === 'ADMIN' ? 'bg-purple-900 text-purple-300' : 'bg-blue-900 text-blue-300'
-                    }`}>
-                      {userData.role}
-                    </span>
-                  </div>
-                  
-                  <div className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      userData.status === 'Active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'
-                    }`}>
-                      {userData.status}
-                    </span>
-                  </div>
-                  
-                  <div className="text-center min-w-[80px]">
-                    <p className="text-white text-sm">{userData.minutesUsed.toFixed(1)}m used</p>
-                    <p className="text-xs text-gray-500">{userData.minutesLeft.toFixed(1)}m left</p>
-                  </div>
-                  
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-sm text-gray-400">
-              Showing {users.length} of {users.length} users
-            </p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled className="border-gray-700 text-gray-500">
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" disabled className="border-gray-700 text-gray-500">
-                Next
-              </Button>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>No users found</p>
+              {searchTerm && <p className="text-sm">Try adjusting your search</p>}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
