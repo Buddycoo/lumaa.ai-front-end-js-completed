@@ -523,6 +523,8 @@ async def initialize_demo_data(db_manager: PostgreSQLManager):
             "pin_code": "1234",
             "function": "System Administrator",
             "sip_endpoint": "sip:admin@lumaa.ai",
+            "sip_endpoints": "sip:admin1@lumaa.ai,sip:admin2@lumaa.ai",
+            "concurrency": 10,
             "prompt": "You are an AI assistant administrator. Be professional and helpful.",
             "min_subscribed": 99999,
             "min_used": 0,
