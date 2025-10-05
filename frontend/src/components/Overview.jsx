@@ -30,6 +30,13 @@ const Overview = () => {
     botStatus: user?.status || 'active'
   });
 
+  // System status for admin (mock for now)
+  const systemStatus = {
+    ai: true,
+    calls: true,
+    whatsapp: false
+  };
+
   useEffect(() => {
     if (isAdmin) {
       fetchAdminOverview();
