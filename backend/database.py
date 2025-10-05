@@ -320,7 +320,7 @@ class DatabaseManager:
 
     async def get_system_settings(self) -> dict:
         """Get system settings"""
-        settings = await self.system_settings.find_one({})
+        settings = await self.system_settings.find_one({}, {"_id": 0})
         if settings:
             return self._parse_from_mongo(settings)
         return {"is_global_paused": False}
