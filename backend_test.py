@@ -706,29 +706,20 @@ class PostgreSQLAPITester:
             return False
 
     def test_system_status(self):
-        """Test system status endpoint"""
-        if not self.user_token:
-            self.log_test("System Status", False, "No user token available")
-            return False
-            
+        """Test system status endpoint - should show PostgreSQL"""
         try:
-            headers = {"Authorization": f"Bearer {self.user_token}"}
-            response = self.session.get(f"{self.api_url}/system/status", 
-                                      headers=headers, timeout=10)
+            response = self.session.get(f"{self.api_url}/system/status", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ['is_global_paused', 'user_status']
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
+                if data.get("database") == "PostgreSQL":
                     self.log_test("System Status", True, 
-                                "System status retrieved successfully",
-                                f"Global paused: {data.get('is_global_paused')}, User status: {data.get('user_status')}")
+                                "System status shows PostgreSQL database",
+                                f"Status: {data.get('status')}, Database: {data.get('database')}")
                     return True
                 else:
                     self.log_test("System Status", False, 
-                                f"Missing fields in system status: {missing_fields}")
+                                f"Expected database: PostgreSQL, got: {data.get('database')}")
                     return False
             else:
                 self.log_test("System Status", False, 
