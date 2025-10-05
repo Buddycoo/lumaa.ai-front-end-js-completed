@@ -139,7 +139,15 @@ async def create_user(
 
 @router.put("/admin/users/{user_id}", response_model=dict)
 async def update_user(
-
+    user_id: str,
+    update_data: UserUpdateRequest,
+    admin_user: dict = Depends(get_admin_user),
+    pg_db_manager: PostgreSQLManager = Depends(get_pg_db_manager)
+):
+    success = await pg_db_manager.update_user(user_id, update_data.dict(exclude_unset=True))
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User updated successfully"}
 
 @router.post("/admin/users/pause-all", response_model=dict)
 async def pause_all_users(
