@@ -399,12 +399,12 @@ app.post('/api/admin/users/resume-all', verifyToken, verifyAdmin, async (req, re
 app.get('/api/admin/overview', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      where: { role: 'user' }
+      where: { role: 'USER' }
     });
     
     const totalRevenue = users.reduce((sum, u) => sum + (u.revenueGenerated || 0), 0);
     const totalMinutesUsed = users.reduce((sum, u) => sum + (u.minUsed || 0), 0);
-    const activeUsers = users.filter(u => u.status === 'active').length;
+    const activeUsers = users.filter(u => u.status === 'ACTIVE').length;
     
     const topUsers = users
       .sort((a, b) => (b.revenueGenerated || 0) - (a.revenueGenerated || 0))
