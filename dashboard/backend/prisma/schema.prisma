@@ -138,7 +138,7 @@ model Lead {
 
 model BotSettings {
   id              String       @id @default(uuid())
-  category        UserCategory @unique
+  category        String       // Changed from enum to match existing
   
   model           String       @default("gpt-4")
   temperature     Float        @default(0.7)
