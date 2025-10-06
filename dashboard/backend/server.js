@@ -334,7 +334,7 @@ app.post('/api/admin/users/:userId/resume', verifyToken, verifyAdmin, async (req
     await prisma.user.update({
       where: { id: req.params.userId },
       data: {
-        status: 'active',
+        status: 'ACTIVE',
         pauseReason: null
       }
     });
@@ -356,7 +356,7 @@ app.post('/api/admin/users/pause-all', verifyToken, verifyAdmin, async (req, res
     }
     
     const result = await prisma.user.updateMany({
-      where: { role: 'USER', status: 'active' },
+      where: { role: 'USER', status: 'ACTIVE' },
       data: {
         status: 'paused',
         pauseReason: reason
@@ -380,7 +380,7 @@ app.post('/api/admin/users/resume-all', verifyToken, verifyAdmin, async (req, re
     const result = await prisma.user.updateMany({
       where: { role: 'USER', status: 'paused' },
       data: {
-        status: 'active',
+        status: 'ACTIVE',
         pauseReason: null
       }
     });
