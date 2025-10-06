@@ -233,7 +233,7 @@ app.listen(PORT, () => {
 app.get('/api/admin/users', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      where: { role: 'user' },
+      where: { role: 'USER' },
       orderBy: { createdAt: 'desc' }
     });
     
@@ -356,7 +356,7 @@ app.post('/api/admin/users/pause-all', verifyToken, verifyAdmin, async (req, res
     }
     
     const result = await prisma.user.updateMany({
-      where: { role: 'user', status: 'active' },
+      where: { role: 'USER', status: 'active' },
       data: {
         status: 'paused',
         pauseReason: reason
@@ -378,7 +378,7 @@ app.post('/api/admin/users/pause-all', verifyToken, verifyAdmin, async (req, res
 app.post('/api/admin/users/resume-all', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const result = await prisma.user.updateMany({
-      where: { role: 'user', status: 'paused' },
+      where: { role: 'USER', status: 'paused' },
       data: {
         status: 'active',
         pauseReason: null
@@ -528,9 +528,9 @@ app.post('/api/admin/send-update', verifyToken, verifyAdmin, async (req, res) =>
     
     let users = [];
     if (recipient_type === 'all') {
-      users = await prisma.user.findMany({ where: { role: 'user' } });
+      users = await prisma.user.findMany({ where: { role: 'USER' } });
     } else if (recipient_type === 'category' && category) {
-      users = await prisma.user.findMany({ where: { role: 'user', category } });
+      users = await prisma.user.findMany({ where: { role: 'USER', category } });
     } else if (recipient_type === 'individual' && recipient_ids) {
       users = await prisma.user.findMany({ where: { id: { in: recipient_ids } } });
     }
