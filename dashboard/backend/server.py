@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import subprocess
 import os
-import signal
 import atexit
 import uvicorn
+import httpx
+import json
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 
 # Global variable to store the subprocess
 node_process = None
+NODE_SERVER_URL = "http://localhost:4001"
 
 def start_node_server():
     """Start the Node.js Express server"""
@@ -60,20 +62,54 @@ async def shutdown_event():
     """Stop the Node.js server when FastAPI shuts down"""
     stop_node_server()
 
-@app.get("/")
-async def root():
-    return {"message": "FastAPI wrapper running Node.js Express server on port 4001"}
-
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "fastapi-wrapper", "backend": "node-express"}
+    return {"status": "ok", "service": "fastapi-wrapper", "backend": "node-express", "proxy_target": NODE_SERVER_URL}
 
-# Catch-all route to inform about the Node.js server
+# Proxy all API requests to Node.js server
+@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def proxy_api(request: Request, path: str):
+    """Proxy all /api requests to the Node.js Express server"""
+    try:
+        # Get request body
+        body = await request.body()
+        
+        # Prepare headers (exclude host)
+        headers = dict(request.headers)
+        headers.pop('host', None)
+        
+        # Make request to Node.js server
+        url = f"{NODE_SERVER_URL}/api/{path}"
+        
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.request(
+                method=request.method,
+                url=url,
+                headers=headers,
+                content=body,
+                params=dict(request.query_params)
+            )
+        
+        # Return the response from Node.js server
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers=dict(response.headers)
+        )
+        
+    except httpx.RequestError as e:
+        print(f"Proxy error: {e}")
+        raise HTTPException(status_code=503, detail="Backend service unavailable")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+# Catch-all route for non-API requests
 @app.get("/{path:path}")
 async def catch_all(path: str):
     return {
-        "message": f"This is a FastAPI wrapper. The actual API is running on port 4001.",
-        "node_api_url": "http://localhost:4001",
+        "message": f"This is a FastAPI proxy. API requests should use /api/ prefix.",
+        "node_server": NODE_SERVER_URL,
         "requested_path": path
     }
 
