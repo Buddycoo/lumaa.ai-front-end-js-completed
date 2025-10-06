@@ -1,28 +1,23 @@
 #!/bin/bash
 
-echo "🚀 Starting BOTH Lumaa AI Servers..."
-echo "====================================="
+echo "🚀 Lumaa AI Dashboard - Supervisor Mode"
+echo "======================================="
 echo ""
-echo "Landing Page: http://localhost:3000"
-echo "Dashboard:    http://localhost:4000"
+echo "✅ Services already running via supervisor:"
+echo "  - Backend (Express.js): Port 8001"
+echo "  - Frontend (React): Port 3000" 
+echo "  - Database (PostgreSQL): Connected"
 echo ""
-echo "Press Ctrl+C to stop all servers"
-echo "====================================="
+echo "🌐 Access your application:"
+echo "  Dashboard: Available via your domain"
 echo ""
-
-# Start landing page in background
-cd landing-page && node start.js &
-LANDING_PID=$!
-
-# Wait a bit
-sleep 3
-
-# Start dashboard in background
-cd ../dashboard && node start.js &
-DASHBOARD_PID=$!
-
-# Wait for Ctrl+C
-trap "echo '\n\nShutting down all servers...'; kill $LANDING_PID $DASHBOARD_PID; exit" INT
-
-# Keep script running
-wait
+echo "📋 Service Management:"
+echo "  - Status: sudo supervisorctl status"
+echo "  - Restart: sudo supervisorctl restart all"
+echo "  - Stop: sudo supervisorctl stop all"
+echo ""
+echo "🔧 Development Commands:"
+echo "  - Backend logs: tail -f /var/log/supervisor/backend.*.log"
+echo "  - Frontend logs: tail -f /var/log/supervisor/frontend.*.log"
+echo ""
+echo "Ready! 🎉"
