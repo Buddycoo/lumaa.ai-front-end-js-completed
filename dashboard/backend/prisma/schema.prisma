@@ -128,7 +128,7 @@ model Lead {
   status      String    @default("new")
   
   createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
   
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   callLogs    CallLog[]
