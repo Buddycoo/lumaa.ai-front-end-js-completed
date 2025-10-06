@@ -53,7 +53,7 @@ function verifyToken(req, res, next) {
 
 // Verify admin role
 function verifyAdmin(req, res, next) {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'ADMIN') {
     return res.status(403).json({ detail: 'Admin access required' });
   }
   next();
