@@ -224,3 +224,38 @@ app.post('/api/auth/verify-pin', verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Dashboard Backend running on http://localhost:${PORT}`);
 });
+
+// ========================================
+// ADMIN ROUTES CONTINUED
+// ========================================
+
+// Get all users
+app.get('/api/admin/users', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: { role: 'user' },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    res.json(users.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      category: u.category,
+      status: u.status,
+      pause_reason: u.pauseReason,
+      minutes_used: u.minUsed,
+      minutes_allocated: u.minSubscribed,
+      revenue_generated: u.revenueGenerated,
+      credits_balance: u.creditsRemaining,
+      monthly_cost: u.monthlyPlanCost,
+      created_at: u.createdAt
+    })));
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ detail: 'Failed to get users' });
+  }
+});
+
+// Create, pause, resume users routes... (add all other routes here)
