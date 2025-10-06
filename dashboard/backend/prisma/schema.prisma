@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum UserCategory {
+  real_estate
+  hospitality
+  sales
+  healthcare
+  automotive
+}
+
+enum UserStatus {
+  active
+  paused
+  blocked
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  overdue
+}
+
+enum CallOutcome {
+  interested
+  not_interested
+  callback
+  no_answer
+  voicemail
+}
+
+enum NotificationType {
+  contact_form
+  admin_update
+  system
+  password_reset
+}
+
+model User {
+  id                  String        @id @default(uuid())
+  name                String
+  email               String        @unique
+  password            String
+  role                UserRole      @default(user)
+  category            UserCategory  @default(sales)
+  status              UserStatus    @default(active)
+  pauseReason         String?       @map("pause_reason")
+  pinCode             String        @map("pin_code")
+  
+  // Additional fields
+  function            String?
+  sipEndpoint         String?       @map("sip_endpoint")
+  sipEndpoints        String?       @map("sip_endpoints")
+  concurrency         Int           @default(5)
+  prompt              String?       @db.Text
+  
+  // Usage tracking
+  minSubscribed       Int           @default(1000) @map("min_subscribed")
+  minUsed             Int           @default(0) @map("min_used")
+  creditsRemaining    Float         @default(0) @map("credits_remaining")
+  monthlyPlanCost     Float         @default(150) @map("monthly_plan_cost")
+  nextBillingDate     DateTime?     @map("next_billing_date")
+  paymentStatus       PaymentStatus @default(pending) @map("payment_status")
+  revenueGenerated    Float         @default(0) @map("revenue_generated")
+  
+  // Password reset
+  resetToken          String?       @map("reset_token")
+  resetTokenExpiry    DateTime?     @map("reset_token_expiry")
+  
+  // Metadata
+  isActive            Boolean       @default(true) @map("is_active")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  
+  // Relations
+  callLogs            CallLog[]
+  leads               Lead[]
+  payments            Payment[]
+  transactions        Transaction[]
+  notifications       Notification[]
+  
+  @@map("lumaa_users")
+}
+
+model CallLog {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  leadId        String?     @map("lead_id")
+  
+  callDate      DateTime    @map("call_date")
+  callTime      String      @map("call_time")
+  duration      Int         @default(0)
+  callOutcome   CallOutcome @map("call_outcome")
+  
+  leadName      String?     @map("lead_name")
+  leadPhone     String?     @map("lead_phone")
+  leadEmail     String?     @map("lead_email")
+  notes         String?     @db.Text
+  
+  createdAt     DateTime    @default(now()) @map("created_at")
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead          Lead?       @relation(fields: [leadId], references: [id])
+  
+  @@map("lumaa_call_logs")
+}
+
+model Lead {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  
+  name        String
+  phone       String
+  email       String?
+  company     String?
+  notes       String?   @db.Text
+  status      String    @default("new")
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  callLogs    CallLog[]
+  
+  @@map("lumaa_leads")
+}
+
+model BotSettings {
+  id              String       @id @default(uuid())
+  category        UserCategory @unique
+  
+  model           String       @default("gpt-4")
+  temperature     Float        @default(0.7)
+  systemPrompt    String?      @map("system_prompt") @db.Text
+  openingMessage  String?      @map("opening_message") @db.Text
+  
+  isActive        Boolean      @default(true) @map("is_active")
+  updatedByAdmin  String       @map("updated_by_admin")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  
+  @@map("lumaa_bot_settings")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  userId        String        @map("user_id")
+  
+  amount        Float
+  paymentDate   DateTime      @map("payment_date")
+  paymentMethod String        @default("card") @map("payment_method")
+  status        PaymentStatus @default(pending)
+  description   String?
+  
+  paidDate      DateTime?     @map("paid_date")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("lumaa_payments")
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  
+  type        String
+  amount      Float
+  description String?
+  status      String   @default("completed")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("lumaa_transactions")
+}
+
+model Notification {
+  id             String           @id @default(uuid())
+  userId         String?          @map("user_id")
+  type           NotificationType
+  
+  title          String
+  message        String           @db.Text
+  data           String?          @db.Text
+  isRead         Boolean          @default(false) @map("is_read")
+  
+  // Contact form fields
+  contactName    String?          @map("contact_name")
+  contactEmail   String?          @map("contact_email")
+  contactPhone   String?          @map("contact_phone")
+  contactCompany String?          @map("contact_company")
+  
+  createdAt      DateTime         @default(now()) @map("created_at")
+  
+  user           User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("lumaa_notifications")
+}
