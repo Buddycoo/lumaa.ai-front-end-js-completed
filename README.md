@@ -1,75 +1,90 @@
-# 🚀 Lumaa AI - AI That Speaks Business
+# 🚀 Lumaa AI - Complete JavaScript Stack
 
-Complete AI calling platform with authentication, dashboard, user management, and payment system.
-
----
-
-## ⚡ Quick Start (2 Commands Only!)
-
-### Prerequisites (Install Once):
-1. **PostgreSQL** - [Download](https://www.postgresql.org/download/)
-2. **Python 3.11+** - [Download](https://www.python.org/downloads/)
-3. **Node.js 16+** - [Download](https://nodejs.org/)
-
-### Setup Database (One-time):
-```sql
-# Open PostgreSQL terminal (psql) and run:
-CREATE DATABASE lumaa_ai_db;
-```
+> **MIGRATION COMPLETE!** Full application converted to JavaScript (Express.js + React + Prisma + PostgreSQL)
 
 ---
 
-## 🎯 Run the Application
+## ⚡ Quick Start (Choose One)
 
-### Mac/Linux Users:
-
-**Terminal 1 (Backend):**
+### Option 1: Run Everything (Easiest)
 ```bash
-./start_backend.sh
+./start_all.sh        # Mac/Linux
+start_all.bat         # Windows
 ```
 
-**Terminal 2 (Frontend):**
+### Option 2: Run Separately
+
+**Terminal 1 - Landing Page:**
 ```bash
-./start_frontend.sh
+cd landing-page && node start.js
 ```
 
-### Windows Users:
-
-**Terminal 1 (Backend):**
-```cmd
-start_backend.bat
-```
-
-**Terminal 2 (Frontend):**
-```cmd
-start_frontend.bat
+**Terminal 2 - Dashboard:**
+```bash
+cd dashboard && node start.js
 ```
 
 ---
 
-## 🌐 Access Your App
+## 🌐 Access
 
-Open browser: **http://localhost:3000**
-
-**Demo Login:**
-- **Admin**: admin@lumaa.ai / pass (PIN: 1509)
-- **User**: user@lumaa.ai / pass (PIN: 5678)
+- **Landing Page**: http://localhost:3000
+- **Dashboard**: http://localhost:4000
+  - Admin: `admin@lumaa.ai` / `pass` (PIN: 1234)
+  - User: `user@lumaa.ai` / `pass` (PIN: 5678)
 
 ---
 
-## ⚙️ First Run Only
+## 📦 Tech Stack
 
-When you run backend script first time:
-1. It will create backend/.env file
-2. Edit the file and replace YOUR_PASSWORD with your PostgreSQL password
-3. Press Enter to continue
+**Backend**: Express.js + Prisma + PostgreSQL
+**Frontend**: React + Tailwind CSS + Zustand
+**Database**: PostgreSQL (shared by both servers)
+
+---
+
+## 📂 Structure
+
+```
+lumaa-ai/
+├── landing-page/
+│   ├── backend/      Express.js (contact form API)
+│   ├── frontend/     React landing page
+│   └── start.js     ← Run this
+│
+├── dashboard/
+│   ├── backend/      Express.js + Prisma (full API)
+│   ├── frontend/     React dashboard
+│   └── start.js     ← Run this
+│
+└── start_all.sh     ← Or run this for both
+```
+
+---
+
+## ✨ Features
+
+✅ Landing page with Spline 3D & contact form
+✅ Complete authentication (JWT, password reset, PIN)
+✅ Admin panel (user management, pause with reason + PIN 1509)
+✅ User dashboard (call logs, bot settings, leads, payments)
+✅ In-app notifications
+✅ Real-time metrics & overview
+✅ Role-based access control
+✅ Paused users see blocking modal with reason
 
 ---
 
 ## 🛑 Stop Servers
 
-Press Ctrl + C in both terminals
+Press **Ctrl + C** in the terminals
 
 ---
 
-See QUICKSTART.md for detailed instructions!
+## 📖 Documentation
+
+See [START_HERE.md](./START_HERE.md) for detailed info.
+
+---
+
+**Made with ❤️ - Full JavaScript Migration Complete!**
