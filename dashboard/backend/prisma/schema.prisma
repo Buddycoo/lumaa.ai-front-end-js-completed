@@ -7,204 +7,302 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  admin
-  user
-}
-
-enum UserCategory {
-  real_estate
-  hospitality
-  sales
-  healthcare
-  automotive
-}
-
-enum UserStatus {
-  active
-  paused
-  blocked
-}
-
-enum PaymentStatus {
-  pending
-  paid
-  overdue
-}
-
-enum CallOutcome {
-  interested
-  not_interested
-  callback
-  no_answer
-  voicemail
-}
-
-enum NotificationType {
-  contact_form
-  admin_update
-  system
-  password_reset
-}
-
 model User {
-  id                  String        @id @default(uuid())
-  name                String
-  email               String        @unique
-  password            String
-  role                UserRole      @default(user)
-  category            UserCategory  @default(sales)
-  status              UserStatus    @default(active)
-  pauseReason         String?       @map("pause_reason")
-  pinCode             String        @map("pin_code")
-  
-  // Additional fields
-  function            String?
-  sipEndpoint         String?       @map("sip_endpoint")
-  sipEndpoints        String?       @map("sip_endpoints")
-  concurrency         Int           @default(5)
-  prompt              String?       @db.Text
-  
-  // Usage tracking
-  minSubscribed       Int           @default(1000) @map("min_subscribed")
-  minUsed             Int           @default(0) @map("min_used")
-  creditsRemaining    Float         @default(0) @map("credits_remaining")
-  monthlyPlanCost     Float         @default(150) @map("monthly_plan_cost")
-  nextBillingDate     DateTime?     @map("next_billing_date")
-  paymentStatus       PaymentStatus @default(pending) @map("payment_status")
-  revenueGenerated    Float         @default(0) @map("revenue_generated")
-  
-  // Password reset
-  resetToken          String?       @map("reset_token")
-  resetTokenExpiry    DateTime?     @map("reset_token_expiry")
-  
-  // Metadata
-  isActive            Boolean       @default(true) @map("is_active")
-  createdAt           DateTime      @default(now()) @map("created_at")
-  updatedAt           DateTime      @updatedAt @map("updated_at")
-  
-  // Relations
-  callLogs            CallLog[]
-  leads               Lead[]
-  payments            Payment[]
-  transactions        Transaction[]
-  notifications       Notification[]
-  
+  id               String         @id @default(uuid()) @db.VarChar
+  name             String         @db.VarChar(255)
+  email            String         @unique @db.VarChar(255)
+  password         String         @db.VarChar(255)
+  role             userrole
+  category         usercategory
+  pinCode          String         @map("pin_code") @db.VarChar(6)
+  status           userstatus
+  function         String?        @db.VarChar(255)
+  sipEndpoint      String?        @map("sip_endpoint") @db.VarChar(255)
+  sipEndpoints     String?        @map("sip_endpoints") @db.VarChar(500)
+  concurrency      Int?
+  prompt           String?
+  minSubscribed    Int?           @map("min_subscribed")
+  minUsed          Int?           @map("min_used")
+  creditsRemaining Float?         @map("credits_remaining")
+  monthlyPlanCost  Float?         @map("monthly_plan_cost")
+  nextBillingDate  DateTime?      @map("next_billing_date") @db.Timestamp(6)
+  paymentStatus    paymentstatus? @map("payment_status")
+  revenueGenerated Float?         @map("revenue_generated")
+  isActive         Boolean?       @map("is_active")
+  createdAt        DateTime?      @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime?      @updatedAt @map("updated_at") @db.Timestamp(6)
+  resetToken       String?        @map("reset_token") @db.VarChar(10)
+  resetTokenExpiry DateTime?      @map("reset_token_expiry") @db.Timestamp(6)
+  pauseReason      String?        @map("pause_reason") @db.VarChar(500)
+  callLogs         CallLog[]
+  leads            Lead[]
+  notifications    Notification[]
+  payments         Payment[]
+  transactions     Transaction[]
+
   @@map("lumaa_users")
 }
 
 model CallLog {
-  id            String      @id @default(uuid())
-  userId        String      @map("user_id")
-  leadId        String?     @map("lead_id")
-  
-  callDate      DateTime    @map("call_date")
-  callTime      String      @map("call_time")
-  duration      Int         @default(0)
-  callOutcome   CallOutcome @map("call_outcome")
-  
-  leadName      String?     @map("lead_name")
-  leadPhone     String?     @map("lead_phone")
-  leadEmail     String?     @map("lead_email")
-  notes         String?     @db.Text
-  
-  createdAt     DateTime    @default(now()) @map("created_at")
-  
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lead          Lead?       @relation(fields: [leadId], references: [id])
-  
+  id                String      @id @default(uuid()) @db.VarChar
+  userId            String      @map("user_id") @db.VarChar
+  leadId            String?     @map("lead_id") @db.VarChar
+  leadName          String      @map("lead_name") @db.VarChar(255)
+  leadPhone         String      @map("lead_phone") @db.VarChar(50)
+  callOutcome       calloutcome @map("call_outcome")
+  duration_minutes  Int?
+  transcript        String?
+  recording_url     String?     @db.VarChar(500)
+  revenue_generated Float?
+  sip_call_id       String?     @db.VarChar(255)
+  caller_id         String?     @db.VarChar(50)
+  createdAt         DateTime?   @map("created_at") @db.Timestamp(6)
+  lead              Lead?       @relation(fields: [leadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("lumaa_call_logs")
 }
 
 model Lead {
-  id          String    @id @default(uuid())
-  userId      String    @map("user_id")
-  
-  name        String
-  phone       String
-  email       String?
-  company     String?
-  notes       String?   @db.Text
-  status      String    @default("new")
-  
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
-  
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  callLogs    CallLog[]
-  
+  id        String    @id @default(uuid()) @db.VarChar
+  userId    String    @map("user_id") @db.VarChar
+  name      String    @db.VarChar(255)
+  phone     String    @db.VarChar(50)
+  email     String?   @db.VarChar(255)
+  company   String?   @db.VarChar(255)
+  notes     String?
+  status    String?   @db.VarChar(50)
+  createdAt DateTime? @map("created_at") @db.Timestamp(6)
+  callLogs  CallLog[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("lumaa_leads")
 }
 
 model BotSettings {
-  id              String       @id @default(uuid())
-  category        String       // Changed from enum to match existing
-  
-  model           String       @default("gpt-4")
-  temperature     Float        @default(0.7)
-  systemPrompt    String?      @map("system_prompt") @db.Text
-  openingMessage  String?      @map("opening_message") @db.Text
-  
-  isActive        Boolean      @default(true) @map("is_active")
-  updatedByAdmin  String       @map("updated_by_admin")
-  updatedAt       DateTime     @updatedAt @map("updated_at")
-  
+  id             String       @id @default(uuid()) @db.VarChar
+  category       usercategory @unique
+  model          botmodel?
+  temperature    Float?
+  openingMessage String?      @map("opening_message")
+  systemPrompt   String?      @map("system_prompt")
+  isActive       Boolean?     @map("is_active")
+  updatedByAdmin String       @map("updated_by_admin") @db.VarChar
+  updatedAt      DateTime?    @updatedAt @map("updated_at") @db.Timestamp(6)
+
   @@map("lumaa_bot_settings")
 }
 
 model Payment {
-  id            String        @id @default(uuid())
-  userId        String        @map("user_id")
-  
-  amount        Float
-  paymentDate   DateTime      @map("payment_date")
-  paymentMethod String        @default("card") @map("payment_method")
-  status        PaymentStatus @default(pending)
-  description   String?
-  
-  paidDate      DateTime?     @map("paid_date")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id                String          @id @default(uuid()) @db.VarChar
+  userId            String          @map("user_id") @db.VarChar
+  amount            Float
+  transaction_type  transactiontype
+  status            paymentstatus?
+  description       String?         @db.VarChar(500)
+  payment_link      String?         @db.VarChar(500)
+  payment_reference String?         @db.VarChar(255)
+  due_date          DateTime?       @db.Timestamp(6)
+  paidDate          DateTime?       @map("paid_date") @db.Timestamp(6)
+  createdAt         DateTime?       @map("created_at") @db.Timestamp(6)
+  user              User            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("lumaa_payments")
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  
-  type        String
-  amount      Float
-  description String?
-  status      String   @default("completed")
-  
-  createdAt   DateTime @default(now()) @map("created_at")
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id               String          @id @default(uuid()) @db.VarChar
+  userId           String          @map("user_id") @db.VarChar
+  amount           Float
+  transaction_type transactiontype
+  description      String          @db.VarChar(500)
+  credits_before   Float?
+  credits_after    Float?
+  createdAt        DateTime?       @map("created_at") @db.Timestamp(6)
+  user             User            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("lumaa_transactions")
 }
 
 model Notification {
-  id             String           @id @default(uuid())
-  userId         String?          @map("user_id")
-  type           String           // Changed from enum to match existing
-  
-  title          String
-  message        String           @db.Text
-  data           String?          @db.Text
-  isRead         Boolean          @default(false) @map("is_read")
-  
-  // Contact form fields
-  contactName    String?          @map("contact_name")
-  contactEmail   String?          @map("contact_email")
-  contactPhone   String?          @map("contact_phone")
-  contactCompany String?          @map("contact_company")
-  
-  createdAt      DateTime         @default(now()) @map("created_at")
-  
-  user           User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id             String           @id @default(uuid()) @db.VarChar
+  userId         String?          @map("user_id") @db.VarChar
+  type           notificationtype
+  title          String           @db.VarChar(255)
+  message        String
+  data           String?
+  isRead         Boolean?         @map("is_read")
+  createdAt      DateTime?        @map("created_at") @db.Timestamp(6)
+  contactName    String?          @map("contact_name") @db.VarChar(255)
+  contactEmail   String?          @map("contact_email") @db.VarChar(255)
+  contactPhone   String?          @map("contact_phone") @db.VarChar(50)
+  contactCompany String?          @map("contact_company") @db.VarChar(255)
+  user           User?            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("lumaa_notifications")
+}
+
+model agents {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique @db.VarChar
+  password_hash String          @db.VarChar
+  profile       Json?           @db.Json
+  call_sessions call_sessions[]
+  leads         leads[]
+
+  @@index([id], map: "ix_agents_id")
+}
+
+model call_logs {
+  id               Int       @id @default(autoincrement())
+  number           String    @db.VarChar
+  unit             String?   @db.VarChar
+  call_duration    String?   @db.VarChar
+  summary          String?
+  transcript       String?
+  recording_url    String?   @db.VarChar
+  call_time        DateTime? @db.Timestamp(6)
+  current_phase    phase?
+  move_forward     Boolean?
+  lead_id          Int?
+  call_time_dubai  DateTime? @db.Timestamptz(6)
+  call_date_dubai  DateTime? @db.Date
+  whatsapp_summary String?   @db.VarChar
+  summary_status   String?   @default("pending") @db.VarChar(50)
+  project          String?
+  cluster          String?
+  call_id          String?   @db.Uuid
+  leads            leads?    @relation(fields: [lead_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id], map: "ix_call_logs_id")
+}
+
+model call_sessions {
+  id         Int       @id @default(autoincrement())
+  agent_id   Int?
+  lead_id    Int?
+  start_time DateTime? @db.Timestamp(6)
+  end_time   DateTime? @db.Timestamp(6)
+  result     String?   @db.VarChar
+  agents     agents?   @relation(fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  leads      leads?    @relation(fields: [lead_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id], map: "ix_call_sessions_id")
+}
+
+model leads {
+  id                    Int             @id @default(autoincrement())
+  name                  String?         @db.VarChar
+  number                String          @unique @db.VarChar
+  property_type         String?         @db.VarChar
+  unit                  String?         @db.VarChar
+  bedroom               String?
+  status                leadstatus?
+  outcome               outcome?
+  last_call_time        DateTime?       @db.Timestamp(6)
+  current_phase         phase?
+  assigned_to           Int?
+  last_call_time_dubai  DateTime?       @db.Timestamptz(6)
+  last_call_date_dubai  DateTime?       @db.Date
+  next_review_at        DateTime?       @db.Timestamptz(6)
+  whatsapp_summary      String?
+  project               String?
+  cluster               String?
+  previous_call_summary String?
+  call_logs             call_logs[]
+  call_sessions         call_sessions[]
+  agents                agents?         @relation(fields: [assigned_to], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id], map: "ix_leads_id")
+  @@index([next_review_at])
+}
+
+model login {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model lumaa_system_settings {
+  id               String    @id @db.VarChar
+  is_global_paused Boolean?
+  updated_by       String    @db.VarChar
+  updated_at       DateTime? @db.Timestamp(6)
+}
+
+enum botmodel {
+  GPT4
+  GPT35
+  CLAUDE
+}
+
+enum calloutcome {
+  INTERESTED
+  NOT_INTERESTED
+  CALLBACK
+  VOICEMAIL
+  NO_ANSWER
+}
+
+enum leadstatus {
+  pending
+  called
+}
+
+enum notificationtype {
+  CONTACT_FORM
+  ADMIN_UPDATE
+  SYSTEM
+  PASSWORD_RESET
+}
+
+enum outcome {
+  responded
+  no_response
+  queued
+}
+
+enum paymentstatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum phase {
+  cold_call
+  light_objection
+  price_pressure
+  near_close
+}
+
+enum transactiontype {
+  TOPUP
+  MONTHLY_BILL
+  USAGE_CHARGE
+}
+
+enum usercategory {
+  REAL_ESTATE
+  HOSPITALITY
+  SALES
+  HEALTHCARE
+  AUTOMOTIVE
+}
+
+enum userrole {
+  ADMIN
+  USER
+  SUPERADMIN
+}
+
+enum userstatus {
+  ACTIVE
+  PAUSED
+  BLOCKED
 }
