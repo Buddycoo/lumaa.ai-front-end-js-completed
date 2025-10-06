@@ -1,0 +1,10 @@
+{
+  "name": "lumaa-landing-page",
+  "version": "1.0.0",
+  "description": "Lumaa AI Landing Page - All-in-one starter",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {}
+}
